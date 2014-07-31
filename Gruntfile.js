@@ -32,6 +32,7 @@ module.exports = function(grunt) {
     checkPages: {
       default_options: {
         options: {
+          pageUrls: []
         },
         files: {
           'tmp/default_options': ['test/fixtures/testing', 'test/fixtures/123']
@@ -40,7 +41,8 @@ module.exports = function(grunt) {
       custom_options: {
         options: {
           separator: ': ',
-          punctuation: ' !!!'
+          punctuation: ' !!!',
+          pageUrls: []
         },
         files: {
           'tmp/custom_options': ['test/fixtures/testing', 'test/fixtures/123']
