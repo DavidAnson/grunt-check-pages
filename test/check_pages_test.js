@@ -22,7 +22,7 @@ var grunt = require('grunt');
     test.ifError(value)
 */
 
-exports.check_pages = {
+exports.checkPages = {
   setUp: function(done) {
     // setup here if necessary
     done();
