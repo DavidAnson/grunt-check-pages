@@ -117,12 +117,17 @@ module.exports = function(grunt) {
   // Register the task with Grunt
   grunt.registerMultiTask('checkPages', 'Checks various aspects of a web page for validity.', function() {
 
+    // Check for unsupported use
+    if (this.files.length) {
+      grunt.fail.warn("checkPages task does not use files; remove the files parameter");
+    }
+
     // Check for required options
     var options = this.options();
     if (!options.pageUrls) {
-      grunt.fail.warn('pageUrls option is not present');
+      grunt.fail.warn('pageUrls option is not present; it should be an array of URLs');
     } else if (!Array.isArray(options.pageUrls)) {
-      grunt.fail.warn('pageUrls option must be an array');
+      grunt.fail.warn('pageUrls option is invalid; it should be an array of URLs');
     }
 
     // Check for and normalize optional options
@@ -131,7 +136,7 @@ module.exports = function(grunt) {
     options.disallowRedirect = !!options.disallowRedirect;
     options.linksToIgnore = options.linksToIgnore || [];
     if (!Array.isArray(options.linksToIgnore)) {
-      grunt.fail.warn('linksToIgnore option must be an array');
+      grunt.fail.warn('linksToIgnore option is invalid; it should be an array');
     }
     options.checkXhtml = !!options.checkXhtml;
 
