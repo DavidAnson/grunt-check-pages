@@ -119,7 +119,7 @@ module.exports = function(grunt) {
 
     // Check for unsupported use
     if (this.files.length) {
-      grunt.fail.warn("checkPages task does not use files; remove the files parameter");
+      grunt.fail.warn('checkPages task does not use files; remove the files parameter');
     }
 
     // Check for required options

@@ -1,6 +1,33 @@
 'use strict';
 
-//var grunt = require('grunt');
+function GruntMock(options, files)  {
+  var self = this;
+  self.options = options;
+  self.files = files || [];
+  self.done = false;
+
+  self.registerMultiTask = function(name, info, fn) {
+    fn.apply({
+      files: self.files,
+      options: function() {
+        return self.options;
+      },
+      async: function() {
+        return function() {
+          self.done = true;
+        };
+      }
+    });
+  };
+
+  self.fail = {
+    warn: function(message) {
+      throw new Error(message);
+    }
+  };
+}
+
+var checkPages = require('../tasks/checkPages.js');
 
 /*
   ======== A Handy Little Nodeunit Reference ========
@@ -23,20 +50,39 @@
 */
 
 exports.checkPages = {
-  setUp: function(done) {
-    // setup here if necessary
-    done();
-  },
-  default_options: function(test) {
+  filesPresent: function(test) {
     test.expect(1);
-
-    test.ok(true);
-
+    test.throws(function() {
+      checkPages(new GruntMock({}, ['file']));
+    }, /checkPages task does not use files; remove the files parameter/);
     test.done();
   },
-  custom_options: function(test) {
-    test.expect(0);
 
+  pageUrlsMissing: function(test) {
+    test.expect(1);
+    test.throws(function() {
+      checkPages(new GruntMock({}));
+    }, /pageUrls option is not present; it should be an array of URLs/);
+    test.done();
+  },
+
+  pageUrlsWrongType: function(test) {
+    test.expect(1);
+    test.throws(function() {
+      checkPages(new GruntMock({
+        pageUrls: 'string'
+      }));
+    }, /pageUrls option is invalid; it should be an array of URLs/);
+    test.done();
+  },
+
+  pageUrlsEmpty: function(test) {
+    test.expect(1);
+    var gruntMock = new GruntMock({
+      pageUrls: []
+    });
+    checkPages(gruntMock);
+    test.ok(gruntMock.done);
     test.done();
   },
 };
