@@ -4,7 +4,7 @@ function GruntMock(files, options, callback)  {
   var self = this;
   self.files = files || [];
   self.options = options || {};
-  self.callback = callback;
+  self.callback = callback || function() { throw new Error('No callback provided'); };
   self.warns = [];
   self.oks = [];
 
@@ -15,7 +15,7 @@ function GruntMock(files, options, callback)  {
         return self.options;
       },
       async: function() {
-        return callback;
+        return self.callback;
       }
     });
   };
@@ -38,6 +38,7 @@ function GruntMock(files, options, callback)  {
 }
 
 var domain = require('domain');
+var nock = require('nock');
 var checkPages = require('../tasks/checkPages.js');
 
 /*
@@ -116,6 +117,9 @@ exports.checkPages = {
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/notFound.html']
     });
+    nock('http://example.com')
+      .get('/notFound.html')
+      .reply(404);
     throws(test, function() {
       checkPages(gruntMock);
     }, 'Bad page (404): http://example.com/notFound.html');
