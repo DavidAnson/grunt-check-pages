@@ -1,10 +1,12 @@
 'use strict';
 
-function GruntMock(options, files)  {
+function GruntMock(files, options, callback)  {
   var self = this;
-  self.options = options;
   self.files = files || [];
-  self.done = false;
+  self.options = options || {};
+  self.callback = callback;
+  self.warns = [];
+  self.oks = [];
 
   self.registerMultiTask = function(name, info, fn) {
     fn.apply({
@@ -13,20 +15,29 @@ function GruntMock(options, files)  {
         return self.options;
       },
       async: function() {
-        return function() {
-          self.done = true;
-        };
+        return callback;
       }
     });
   };
 
+  self.log = {
+    ok: function(message) {
+      self.oks.push(message);
+    },
+    warn: function(message) {
+      self.warns.push(message);
+    }
+  };
+
   self.fail = {
     warn: function(message) {
+      self.warns.push(message);
       throw new Error(message);
     }
   };
 }
 
+var domain = require('domain');
 var checkPages = require('../tasks/checkPages.js');
 
 /*
@@ -49,40 +60,64 @@ var checkPages = require('../tasks/checkPages.js');
     test.ifError(value)
 */
 
+// Replacement for test.throws that handles exceptions from a callback method
+function throws(test, block, message) {
+  var d = domain.create();
+  d.on('error', function(err) {
+    test.equal(err.message, message);
+    test.done();
+  });
+  d.run(function() {
+    process.nextTick(block);
+  });
+}
+
 exports.checkPages = {
   filesPresent: function(test) {
     test.expect(1);
-    test.throws(function() {
-      checkPages(new GruntMock({}, ['file']));
-    }, /checkPages task does not use files; remove the files parameter/);
-    test.done();
+    var gruntMock = new GruntMock(['file'], {});
+    throws(test, function() {
+      checkPages(gruntMock);
+    }, 'checkPages task does not use files; remove the files parameter');
   },
 
   pageUrlsMissing: function(test) {
     test.expect(1);
-    test.throws(function() {
-      checkPages(new GruntMock({}));
-    }, /pageUrls option is not present; it should be an array of URLs/);
-    test.done();
+    var gruntMock = new GruntMock([], {});
+    throws(test, function() {
+      checkPages(gruntMock);
+    }, 'pageUrls option is not present; it should be an array of URLs');
   },
 
   pageUrlsWrongType: function(test) {
     test.expect(1);
-    test.throws(function() {
-      checkPages(new GruntMock({
+    var gruntMock = new GruntMock([], {
         pageUrls: 'string'
-      }));
-    }, /pageUrls option is invalid; it should be an array of URLs/);
-    test.done();
+      });
+    throws(test, function() {
+      checkPages(gruntMock);
+    }, 'pageUrls option is invalid; it should be an array of URLs');
   },
 
   pageUrlsEmpty: function(test) {
-    test.expect(1);
-    var gruntMock = new GruntMock({
+    test.expect(2);
+    var gruntMock = new GruntMock([], {
       pageUrls: []
+    }, function() {
+      test.equal(gruntMock.oks.length, 0);
+      test.equal(gruntMock.warns.length, 0);
+      test.done();
     });
     checkPages(gruntMock);
-    test.ok(gruntMock.done);
-    test.done();
   },
+
+  pageNotFound: function(test) {
+    test.expect(1);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/notFound.html']
+    });
+    throws(test, function() {
+      checkPages(gruntMock);
+    }, 'Bad page (404): http://example.com/notFound.html');
+  }
 };
