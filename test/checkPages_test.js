@@ -37,6 +37,7 @@ function GruntMock(files, options, callback)  {
   };
 }
 
+var path = require('path');
 var domain = require('domain');
 var nock = require('nock');
 var checkPages = require('../tasks/checkPages.js');
@@ -65,12 +66,24 @@ var checkPages = require('../tasks/checkPages.js');
 function throws(test, block, message) {
   var d = domain.create();
   d.on('error', function(err) {
+    d.dispose();
     test.equal(err.message, message);
     test.done();
   });
   d.run(function() {
     process.nextTick(block);
   });
+}
+
+function outputs(test, gruntMock, oks, warns) {
+  test.equal(gruntMock.oks.length, oks.length);
+  while(oks.length) {
+    test.equal(gruntMock.oks.shift(), oks.shift());
+  }
+  test.equal(gruntMock.warns.length, warns.length);
+  while(oks.warns) {
+    test.equal(gruntMock.warns.shift(), warns.shift());
+  }
 }
 
 exports.checkPages = {
@@ -105,8 +118,7 @@ exports.checkPages = {
     var gruntMock = new GruntMock([], {
       pageUrls: []
     }, function() {
-      test.equal(gruntMock.oks.length, 0);
-      test.equal(gruntMock.warns.length, 0);
+      outputs(test, gruntMock, [], []);
       test.done();
     });
     checkPages(gruntMock);
@@ -114,14 +126,29 @@ exports.checkPages = {
 
   pageNotFound: function(test) {
     test.expect(1);
-    var gruntMock = new GruntMock([], {
-      pageUrls: ['http://example.com/notFound.html']
-    });
     nock('http://example.com')
       .get('/notFound.html')
       .reply(404);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/notFound.html']
+    });
     throws(test, function() {
       checkPages(gruntMock);
     }, 'Bad page (404): http://example.com/notFound.html');
+  },
+
+  checkXhtmlValid: function(test) {
+    test.expect(3);
+    nock('http://example.com')
+      .get('/validPage.html')
+      .replyWithFile(200, path.join(__dirname, 'validPage.html'), { 'Content-Type': 'text/html' });
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkXhtml: true
+    }, function() {
+      outputs(test, gruntMock, ['Page: http://example.com/validPage.html'], []);
+      test.done();
+    });
+    checkPages(gruntMock);
   }
 };
