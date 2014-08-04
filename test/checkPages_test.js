@@ -42,6 +42,9 @@ var domain = require('domain');
 var nock = require('nock');
 var checkPages = require('../tasks/checkPages.js');
 
+// Block all unexpected network calls
+nock.disableNetConnect();
+
 /*
   ======== A Handy Little Nodeunit Reference ========
   https://github.com/caolan/nodeunit
@@ -101,17 +104,25 @@ function throwsWrapper(test, gruntMock, oks, warns) {
     });
 }
 
-function nockAndMockXhtmlFile(page, callback) {
-  nock('http://example.com')
-    .get('/' + page)
-    .replyWithFile(
-      200,
-      path.join(__dirname, page),
-      { 'Content-Type': 'text/html' });
-  return new GruntMock([], {
-    pageUrls: ['http://example.com/' + page],
-    checkXhtml: true
-  }, callback);
+function nockFiles(files, base) {
+  var scope = nock(base || 'http://example.com');
+  files.forEach(function(file) {
+    scope
+      .get('/' + file)
+      .replyWithFile(
+        200,
+        path.join(__dirname, file),
+        { 'Content-Type': 'text/html' });
+  });
+}
+
+function nockLinks(links, base) {
+  var scope = nock(base || 'http://example.com');
+  links.forEach(function(link) {
+    scope
+      .head('/' + link)
+      .reply(200);
+  });
 }
 
 exports.checkPages = {
@@ -160,11 +171,34 @@ exports.checkPages = {
     throwsWrapper(test, gruntMock, [], ['Bad page (404): http://example.com/notFound.html']);
   },
 
+  /* checkLinks */
+
+  checkLinksValid: function(test) {
+    test.expect(5);
+    nockFiles(['validPage.html']);
+    nockLinks(['okLink']);
+    nockLinks(['okLink'], 'http://example.org');
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkLinks: true
+    }, function() {
+      outputs(test, gruntMock,
+        ['Page: http://example.com/validPage.html', 'Link: http://example.org/okLink', 'Link: http://example.com/okLink'],
+        []);
+      test.done();
+    });
+    checkPages(gruntMock);
+  },
+
   /* checkXhtml */
 
   checkXhtmlValid: function(test) {
     test.expect(3);
-    var gruntMock = nockAndMockXhtmlFile('validPage.html', function() {
+    nockFiles(['validPage.html']);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkXhtml: true
+    }, function() {
       outputs(test, gruntMock,
         ['Page: http://example.com/validPage.html'],
         []);
@@ -175,7 +209,11 @@ exports.checkPages = {
 
   checkXhtmlUnclosedElement: function(test) {
     test.expect(6);
-    var gruntMock = nockAndMockXhtmlFile('unclosedElement.html');
+    nockFiles(['unclosedElement.html']);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/unclosedElement.html'],
+      checkXhtml: true
+    });
     throwsWrapper(test, gruntMock,
       ['Page: http://example.com/unclosedElement.html'],
       ['Unexpected close tag, Line: 5, Column: 7, Char: >', '1 XHTML parse error(s), see above']);
@@ -183,7 +221,11 @@ exports.checkPages = {
 
   checkXhtmlUnclosedImg: function(test) {
     test.expect(6);
-    var gruntMock = nockAndMockXhtmlFile('unclosedImg.html');
+    nockFiles(['unclosedImg.html']);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/unclosedImg.html'],
+      checkXhtml: true
+    });
     throwsWrapper(test, gruntMock,
       ['Page: http://example.com/unclosedImg.html'],
       ['Unexpected close tag, Line: 4, Column: 7, Char: >', '1 XHTML parse error(s), see above']);
@@ -191,7 +233,11 @@ exports.checkPages = {
 
   checkXhtmlInvalidEntity : function(test) {
     test.expect(6);
-    var gruntMock = nockAndMockXhtmlFile('invalidEntity.html');
+    nockFiles(['invalidEntity.html']);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/invalidEntity.html'],
+      checkXhtml: true
+    });
     throwsWrapper(test, gruntMock,
       ['Page: http://example.com/invalidEntity.html'],
       ['Invalid character entity, Line: 3, Column: 21, Char: ;', '1 XHTML parse error(s), see above']);
@@ -199,7 +245,11 @@ exports.checkPages = {
 
   checkXhtmlMultipleErrors : function(test) {
     test.expect(7);
-    var gruntMock = nockAndMockXhtmlFile('multipleErrors.html');
+    nockFiles(['multipleErrors.html']);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/multipleErrors.html'],
+      checkXhtml: true
+    });
     throwsWrapper(test, gruntMock,
       ['Page: http://example.com/multipleErrors.html'],
       ['Invalid character entity, Line: 4, Column: 23, Char: ;', 'Unexpected close tag, Line: 5, Column: 6, Char: >', '2 XHTML parse error(s), see above']);
