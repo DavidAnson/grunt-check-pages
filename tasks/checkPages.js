@@ -83,7 +83,7 @@ module.exports = function(grunt) {
               };
               parser.write(res.text);
               if (errors) {
-                grunt.fail.warn(errors + ' XHTML parse errors (see above)');
+                grunt.fail.warn(errors + ' XHTML parse error(s), see above');
               }
             }
           }

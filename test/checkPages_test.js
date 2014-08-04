@@ -63,11 +63,14 @@ var checkPages = require('../tasks/checkPages.js');
 */
 
 // Replacement for test.throws that handles exceptions from a callback method
-function throws(test, block, message) {
+function throws(test, block, message, assertions) {
   var d = domain.create();
   d.on('error', function(err) {
     d.dispose();
     test.equal(err.message, message);
+    if (assertions) {
+      assertions();
+    }
     test.done();
   });
   d.run(function() {
@@ -81,36 +84,48 @@ function outputs(test, gruntMock, oks, warns) {
     test.equal(gruntMock.oks.shift(), oks.shift());
   }
   test.equal(gruntMock.warns.length, warns.length);
-  while(oks.warns) {
+  while(warns.length) {
     test.equal(gruntMock.warns.shift(), warns.shift());
   }
 }
 
 exports.checkPages = {
   filesPresent: function(test) {
-    test.expect(1);
+    test.expect(4);
     var gruntMock = new GruntMock(['file'], {});
-    throws(test, function() {
-      checkPages(gruntMock);
-    }, 'checkPages task does not use files; remove the files parameter');
+    throws(
+      test,
+      function() { checkPages(gruntMock); },
+      'checkPages task does not use files; remove the files parameter',
+      function() {
+        outputs(test, gruntMock, [], ['checkPages task does not use files; remove the files parameter']);
+      });
   },
 
   pageUrlsMissing: function(test) {
-    test.expect(1);
+    test.expect(4);
     var gruntMock = new GruntMock([], {});
-    throws(test, function() {
-      checkPages(gruntMock);
-    }, 'pageUrls option is not present; it should be an array of URLs');
+    throws(
+      test,
+      function() { checkPages(gruntMock); },
+      'pageUrls option is not present; it should be an array of URLs',
+      function() {
+        outputs(test, gruntMock, [], ['pageUrls option is not present; it should be an array of URLs']);
+      });
   },
 
   pageUrlsWrongType: function(test) {
-    test.expect(1);
+    test.expect(4);
     var gruntMock = new GruntMock([], {
         pageUrls: 'string'
       });
-    throws(test, function() {
-      checkPages(gruntMock);
-    }, 'pageUrls option is invalid; it should be an array of URLs');
+    throws(
+      test,
+      function() { checkPages(gruntMock); },
+      'pageUrls option is invalid; it should be an array of URLs',
+      function() {
+        outputs(test, gruntMock, [], ['pageUrls option is invalid; it should be an array of URLs']);
+      });
   },
 
   pageUrlsEmpty: function(test) {
@@ -125,16 +140,20 @@ exports.checkPages = {
   },
 
   pageNotFound: function(test) {
-    test.expect(1);
+    test.expect(4);
     nock('http://example.com')
       .get('/notFound.html')
       .reply(404);
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/notFound.html']
     });
-    throws(test, function() {
-      checkPages(gruntMock);
-    }, 'Bad page (404): http://example.com/notFound.html');
+    throws(
+      test,
+      function() { checkPages(gruntMock); },
+      'Bad page (404): http://example.com/notFound.html',
+      function() {
+        outputs(test, gruntMock, [], ['Bad page (404): http://example.com/notFound.html']);
+      });
   },
 
   checkXhtmlValid: function(test) {
@@ -150,5 +169,23 @@ exports.checkPages = {
       test.done();
     });
     checkPages(gruntMock);
-  }
+  },
+
+  checkXhtmlUnclosedImg: function(test) {
+    test.expect(6);
+    nock('http://example.com')
+      .get('/unclosedImg.html')
+      .replyWithFile(200, path.join(__dirname, 'unclosedImg.html'), { 'Content-Type': 'text/html' });
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/unclosedImg.html'],
+      checkXhtml: true
+    });
+    throws(
+      test,
+      function() { checkPages(gruntMock); },
+      '1 XHTML parse error(s), see above',
+      function() {
+        outputs(test, gruntMock, ['Page: http://example.com/unclosedImg.html'], ['Unexpected close tag, Line: 4, Column: 7, Char: >', '1 XHTML parse error(s), see above']);
+      });
+  },
 };
