@@ -1,5 +1,6 @@
 'use strict';
 
+// Requires
 var path = require('path');
 var domain = require('domain');
 var nock = require('nock');
@@ -9,7 +10,7 @@ var checkPages = require('../tasks/checkPages.js');
 // Block all unexpected network calls
 nock.disableNetConnect();
 
-// Replacement for test.throws that handles exceptions from a callback method
+// Replacement for test.throws that handles exceptions from a callback method by using a domain
 function throws(test, block, message, assertions) {
   var d = domain.create();
   d.on('error', function(err) {
@@ -21,11 +22,11 @@ function throws(test, block, message, assertions) {
     test.done();
   });
   d.run(function() {
-    process.nextTick(block);
+    process.nextTick(block); // Include synchronous exceptions in the domain
   });
 }
 
-// Tests the task's output via the Grunt mock
+// Verifies a task's output via the Grunt mock
 function testOutput(test, gruntMock, oks, warns) {
   test.equal(gruntMock.oks.length, oks.length);
   while(oks.length) {
@@ -37,20 +38,16 @@ function testOutput(test, gruntMock, oks, warns) {
   }
 }
 
-// Calls checkPages within a throws block
+// Calls the checkPages task within a throws block
 function checkPagesThrows(test, gruntMock, oks, warns) {
   throws(
     test,
-    function() {
-      checkPages(gruntMock);
-    },
+    function() { checkPages(gruntMock); },
     warns[warns.length - 1],
-    function() {
-      testOutput(test, gruntMock, oks, warns);
-    });
+    function() { testOutput(test, gruntMock, oks, warns); });
 }
 
-/* Nock helpers */
+/* Helpers for mocking HTTP requests */
 
 function nockFiles(files, base) {
   var scope = nock(base || 'http://example.com');
@@ -104,14 +101,23 @@ exports.checkPages = {
 
   linksToIgnoreWrongType: function(test) {
     test.expect(4);
-    var gruntMock = new GruntMock([], { pageUrls: [], linksToIgnore: 10 });
+    var gruntMock = new GruntMock([], { pageUrls: [], linksToIgnore: 'string' });
     checkPagesThrows(test, gruntMock, [], ['linksToIgnore option is invalid; it should be an array']);
   },
+
+  noActionOption: function(test) {
+    test.expect(4);
+    var gruntMock = new GruntMock([], { pageUrls: ['http://example.com/'] });
+    checkPagesThrows(test, gruntMock, [], ['nothing to do; enable one or more of [checkLinks, checkXhtml]']);
+  },
+
+  /* Basic functionality */
 
   pageUrlsEmpty: function(test) {
     test.expect(2);
     var gruntMock = new GruntMock([], {
-      pageUrls: []
+      pageUrls: [],
+      checkLinks: true
     }, function() {
       testOutput(test, gruntMock, [], []);
       test.done();
@@ -119,15 +125,14 @@ exports.checkPages = {
     checkPages(gruntMock);
   },
 
-  /* Basic functionality */
-
   pageNotFound: function(test) {
     test.expect(4);
     nock('http://example.com')
       .get('/notFound')
       .reply(404);
     var gruntMock = new GruntMock([], {
-      pageUrls: ['http://example.com/notFound']
+      pageUrls: ['http://example.com/notFound'],
+      checkLinks: true
     });
     checkPagesThrows(test, gruntMock, [], ['Bad page (404): http://example.com/notFound']);
   },
@@ -280,7 +285,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/unclosedElement.html'],
       ['Unexpected close tag, Line: 5, Column: 7, Char: >',
-       '1 XHTML parse error(s), see above']);
+       '1 XHTML parse error, see above']);
   },
 
   checkXhtmlUnclosedImg: function(test) {
@@ -293,7 +298,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/unclosedImg.html'],
       ['Unexpected close tag, Line: 4, Column: 7, Char: >',
-       '1 XHTML parse error(s), see above']);
+       '1 XHTML parse error, see above']);
   },
 
   checkXhtmlInvalidEntity : function(test) {
@@ -306,7 +311,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/invalidEntity.html'],
       ['Invalid character entity, Line: 3, Column: 21, Char: ;',
-       '1 XHTML parse error(s), see above']);
+       '1 XHTML parse error, see above']);
   },
 
   checkXhtmlMultipleErrors : function(test) {
@@ -320,6 +325,6 @@ exports.checkPages = {
       ['Page: http://example.com/multipleErrors.html'],
       ['Invalid character entity, Line: 4, Column: 23, Char: ;',
        'Unexpected close tag, Line: 5, Column: 6, Char: >',
-       '2 XHTML parse error(s), see above']);
+       '2 XHTML parse errors, see above']);
   },
 };
