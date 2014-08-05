@@ -25,7 +25,8 @@ function throws(test, block, message, assertions) {
   });
 }
 
-function outputs(test, gruntMock, oks, warns) {
+// Tests the task's output via the Grunt mock
+function testOutput(test, gruntMock, oks, warns) {
   test.equal(gruntMock.oks.length, oks.length);
   while(oks.length) {
     test.equal(gruntMock.oks.shift(), oks.shift());
@@ -36,6 +37,7 @@ function outputs(test, gruntMock, oks, warns) {
   }
 }
 
+// Calls checkPages within a throws block
 function checkPagesThrows(test, gruntMock, oks, warns) {
   throws(
     test,
@@ -44,9 +46,11 @@ function checkPagesThrows(test, gruntMock, oks, warns) {
     },
     warns[warns.length - 1],
     function() {
-      outputs(test, gruntMock, oks, warns);
+      testOutput(test, gruntMock, oks, warns);
     });
 }
+
+/* Nock helpers */
 
 function nockFiles(files, base) {
   var scope = nock(base || 'http://example.com');
@@ -59,7 +63,6 @@ function nockFiles(files, base) {
         { 'Content-Type': 'text/html' });
   });
 }
-
 function nockLinks(links, base) {
   var scope = nock(base || 'http://example.com');
   links.forEach(function(link) {
@@ -68,7 +71,6 @@ function nockLinks(links, base) {
       .reply(200);
   });
 }
-
 function nockRedirect(link, status) {
   nock('http://example.com')
     .head('/' + link)
@@ -80,7 +82,7 @@ function nockRedirect(link, status) {
 
 exports.checkPages = {
 
-  /* Parameters */
+  /* Task parameters */
 
   filesPresent: function(test) {
     test.expect(4);
@@ -111,13 +113,13 @@ exports.checkPages = {
     var gruntMock = new GruntMock([], {
       pageUrls: []
     }, function() {
-      outputs(test, gruntMock, [], []);
+      testOutput(test, gruntMock, [], []);
       test.done();
     });
     checkPages(gruntMock);
   },
 
-  /* General */
+  /* Basic functionality */
 
   pageNotFound: function(test) {
     test.expect(4);
@@ -130,7 +132,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock, [], ['Bad page (404): http://example.com/notFound']);
   },
 
-  /* checkLinks */
+  /* checkLinks functionality */
 
   checkLinksValid: function(test) {
     test.expect(19);
@@ -148,7 +150,7 @@ exports.checkPages = {
       pageUrls: ['http://example.com/validPage.html'],
       checkLinks: true
     }, function() {
-      outputs(test, gruntMock,
+      testOutput(test, gruntMock,
         ['Page: http://example.com/validPage.html',
          'Link: http://example.com/link13',
          'Link: http://example.com/link12',
@@ -181,7 +183,7 @@ exports.checkPages = {
       checkLinks: true,
       onlySameDomainLinks: true
     }, function() {
-      outputs(test, gruntMock,
+      testOutput(test, gruntMock,
         ['Page: http://example.com/externalLink.html', 'Link: http://example.com/link'],
         []);
       test.done();
@@ -212,15 +214,46 @@ exports.checkPages = {
       checkLinks: true,
       linksToIgnore: ['http://example.com/ignore0', 'http://example.com/ignore1']
     }, function() {
-      outputs(test, gruntMock,
-        ['Page: http://example.com/ignoreLinks.html', 'Link: http://example.com/link2', 'Link: http://example.com/link1', 'Link: http://example.com/link0'],
+      testOutput(test, gruntMock,
+        ['Page: http://example.com/ignoreLinks.html',
+         'Link: http://example.com/link2',
+         'Link: http://example.com/link1',
+         'Link: http://example.com/link0'],
         []);
       test.done();
     });
     checkPages(gruntMock);
   },
 
-  /* checkXhtml */
+  checkLinksMultiplePages: function(test) {
+    test.expect(10);
+    nockFiles(['externalLink.html', 'redirectLink.html', 'ignoreLinks.html']);
+    nockLinks(['link', 'link0', 'link1', 'link2', 'redirect_redirected']);
+    nockRedirect('redirect');
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/externalLink.html',
+                 'http://example.com/redirectLink.html',
+                 'http://example.com/ignoreLinks.html'],
+      checkLinks: true,
+      onlySameDomainLinks: true,
+      linksToIgnore: ['http://example.com/ignore0', 'http://example.com/ignore1']
+    }, function() {
+      testOutput(test, gruntMock,
+        ['Page: http://example.com/externalLink.html',
+         'Link: http://example.com/link',
+         'Page: http://example.com/redirectLink.html',
+         'Link: http://example.com/redirect',
+         'Page: http://example.com/ignoreLinks.html',
+         'Link: http://example.com/link2',
+         'Link: http://example.com/link1',
+         'Link: http://example.com/link0'],
+        []);
+      test.done();
+    });
+    checkPages(gruntMock);
+  },
+
+  /* checkXhtml functionality */
 
   checkXhtmlValid: function(test) {
     test.expect(3);
@@ -229,7 +262,7 @@ exports.checkPages = {
       pageUrls: ['http://example.com/validPage.html'],
       checkXhtml: true
     }, function() {
-      outputs(test, gruntMock,
+      testOutput(test, gruntMock,
         ['Page: http://example.com/validPage.html'],
         []);
       test.done();
@@ -246,7 +279,8 @@ exports.checkPages = {
     });
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/unclosedElement.html'],
-      ['Unexpected close tag, Line: 5, Column: 7, Char: >', '1 XHTML parse error(s), see above']);
+      ['Unexpected close tag, Line: 5, Column: 7, Char: >',
+       '1 XHTML parse error(s), see above']);
   },
 
   checkXhtmlUnclosedImg: function(test) {
@@ -258,7 +292,8 @@ exports.checkPages = {
     });
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/unclosedImg.html'],
-      ['Unexpected close tag, Line: 4, Column: 7, Char: >', '1 XHTML parse error(s), see above']);
+      ['Unexpected close tag, Line: 4, Column: 7, Char: >',
+       '1 XHTML parse error(s), see above']);
   },
 
   checkXhtmlInvalidEntity : function(test) {
@@ -270,7 +305,8 @@ exports.checkPages = {
     });
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/invalidEntity.html'],
-      ['Invalid character entity, Line: 3, Column: 21, Char: ;', '1 XHTML parse error(s), see above']);
+      ['Invalid character entity, Line: 3, Column: 21, Char: ;',
+       '1 XHTML parse error(s), see above']);
   },
 
   checkXhtmlMultipleErrors : function(test) {
@@ -282,6 +318,8 @@ exports.checkPages = {
     });
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/multipleErrors.html'],
-      ['Invalid character entity, Line: 4, Column: 23, Char: ;', 'Unexpected close tag, Line: 5, Column: 6, Char: >', '2 XHTML parse error(s), see above']);
+      ['Invalid character entity, Line: 4, Column: 23, Char: ;',
+       'Unexpected close tag, Line: 5, Column: 6, Char: >',
+       '2 XHTML parse error(s), see above']);
   },
 };
