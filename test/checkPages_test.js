@@ -125,6 +125,15 @@ function nockLinks(links, base) {
   });
 }
 
+function nockRedirect(link, status) {
+  nock('http://example.com')
+    .head('/' + link)
+    .reply(
+      status,
+      '',
+      { 'Location': '/okLink' });
+}
+
 exports.checkPages = {
 
   /* Parameters */
@@ -174,16 +183,35 @@ exports.checkPages = {
   /* checkLinks */
 
   checkLinksValid: function(test) {
-    test.expect(17);
+    test.expect(19);
     nockFiles(['validPage.html']);
-    nockLinks(['okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink']);
+    nockLinks(['okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink']);
+    nockRedirect('movedPermanently', 301);
+    nockRedirect('movedTemporarily', 302);
     nockLinks(['okLink'], 'http://example.org');
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/validPage.html'],
       checkLinks: true
     }, function() {
       outputs(test, gruntMock,
-        ['Page: http://example.com/validPage.html', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.org/okLink', 'Link: http://example.com/okLink'],
+        ['Page: http://example.com/validPage.html', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/movedTemporarily', 'Link: http://example.com/movedPermanently', 'Link: http://example.org/okLink', 'Link: http://example.com/okLink'],
+        []);
+      test.done();
+    });
+    checkPages(gruntMock);
+  },
+
+  checkLinksOnlySameDomainLinks: function(test) {
+    test.expect(4);
+    nockFiles(['externalLink.html']);
+    nockLinks(['okLink']);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/externalLink.html'],
+      checkLinks: true,
+      onlySameDomainLinks: true
+    }, function() {
+      outputs(test, gruntMock,
+        ['Page: http://example.com/externalLink.html', 'Link: http://example.com/okLink'],
         []);
       test.done();
     });
