@@ -1,69 +1,13 @@
 'use strict';
 
-function GruntMock(files, options, callback)  {
-  var self = this;
-  self.files = files || [];
-  self.options = options || {};
-  self.callback = callback || function() { throw new Error('No callback provided'); };
-  self.warns = [];
-  self.oks = [];
-
-  self.registerMultiTask = function(name, info, fn) {
-    fn.apply({
-      files: self.files,
-      options: function() {
-        return self.options;
-      },
-      async: function() {
-        return self.callback;
-      }
-    });
-  };
-
-  self.log = {
-    ok: function(message) {
-      self.oks.push(message);
-    },
-    warn: function(message) {
-      self.warns.push(message);
-    }
-  };
-
-  self.fail = {
-    warn: function(message) {
-      self.warns.push(message);
-      throw new Error(message);
-    }
-  };
-}
-
 var path = require('path');
 var domain = require('domain');
 var nock = require('nock');
+var GruntMock = require('./GruntMock');
 var checkPages = require('../tasks/checkPages.js');
 
 // Block all unexpected network calls
 nock.disableNetConnect();
-
-/*
-  ======== A Handy Little Nodeunit Reference ========
-  https://github.com/caolan/nodeunit
-
-  Test methods:
-    test.expect(numAssertions)
-    test.done()
-  Test assertions:
-    test.ok(value, [message])
-    test.equal(actual, expected, [message])
-    test.notEqual(actual, expected, [message])
-    test.deepEqual(actual, expected, [message])
-    test.notDeepEqual(actual, expected, [message])
-    test.strictEqual(actual, expected, [message])
-    test.notStrictEqual(actual, expected, [message])
-    test.throws(block, [error], [message])
-    test.doesNotThrow(block, [error], [message])
-    test.ifError(value)
-*/
 
 // Replacement for test.throws that handles exceptions from a callback method
 function throws(test, block, message, assertions) {
