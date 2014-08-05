@@ -36,7 +36,7 @@ function outputs(test, gruntMock, oks, warns) {
   }
 }
 
-function throwsWrapper(test, gruntMock, oks, warns) {
+function checkPagesThrows(test, gruntMock, oks, warns) {
   throws(
     test,
     function() {
@@ -73,9 +73,9 @@ function nockRedirect(link, status) {
   nock('http://example.com')
     .head('/' + link)
     .reply(
-      status,
+      status || 301,
       '',
-      { 'Location': '/okLink' });
+      { 'Location': '/' + link + '_redirected' });
 }
 
 exports.checkPages = {
@@ -85,19 +85,25 @@ exports.checkPages = {
   filesPresent: function(test) {
     test.expect(4);
     var gruntMock = new GruntMock(['file'], {});
-    throwsWrapper(test, gruntMock, [], ['checkPages task does not use files; remove the files parameter']);
+    checkPagesThrows(test, gruntMock, [], ['checkPages task does not use files; remove the files parameter']);
   },
 
   pageUrlsMissing: function(test) {
     test.expect(4);
     var gruntMock = new GruntMock([], {});
-    throwsWrapper(test, gruntMock, [], ['pageUrls option is not present; it should be an array of URLs']);
+    checkPagesThrows(test, gruntMock, [], ['pageUrls option is not present; it should be an array of URLs']);
   },
 
   pageUrlsWrongType: function(test) {
     test.expect(4);
     var gruntMock = new GruntMock([], { pageUrls: 'string' });
-    throwsWrapper(test, gruntMock, [], ['pageUrls option is invalid; it should be an array of URLs']);
+    checkPagesThrows(test, gruntMock, [], ['pageUrls option is invalid; it should be an array of URLs']);
+  },
+
+  linksToIgnoreWrongType: function(test) {
+    test.expect(4);
+    var gruntMock = new GruntMock([], { pageUrls: [], linksToIgnore: 10 });
+    checkPagesThrows(test, gruntMock, [], ['linksToIgnore option is invalid; it should be an array']);
   },
 
   pageUrlsEmpty: function(test) {
@@ -121,7 +127,7 @@ exports.checkPages = {
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/notFound']
     });
-    throwsWrapper(test, gruntMock, [], ['Bad page (404): http://example.com/notFound']);
+    checkPagesThrows(test, gruntMock, [], ['Bad page (404): http://example.com/notFound']);
   },
 
   /* checkLinks */
@@ -129,16 +135,37 @@ exports.checkPages = {
   checkLinksValid: function(test) {
     test.expect(19);
     nockFiles(['validPage.html']);
-    nockLinks(['okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink']);
+    nockLinks([
+      'link0', 'link1', 'link3', 'link4', 'link5',
+      'link6', 'link7', 'link8', 'link9', 'link10',
+      'link11', 'link12', 'link13',
+      'movedTemporarily_redirected',
+      'movedPermanently_redirected']);
     nockRedirect('movedPermanently', 301);
     nockRedirect('movedTemporarily', 302);
-    nockLinks(['okLink'], 'http://example.org');
+    nockLinks(['link2'], 'http://example.org');
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/validPage.html'],
       checkLinks: true
     }, function() {
       outputs(test, gruntMock,
-        ['Page: http://example.com/validPage.html', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/movedTemporarily', 'Link: http://example.com/movedPermanently', 'Link: http://example.org/okLink', 'Link: http://example.com/okLink'],
+        ['Page: http://example.com/validPage.html',
+         'Link: http://example.com/link13',
+         'Link: http://example.com/link12',
+         'Link: http://example.com/link11',
+         'Link: http://example.com/link10',
+         'Link: http://example.com/link9',
+         'Link: http://example.com/link0',
+         'Link: http://example.com/link8',
+         'Link: http://example.com/link7',
+         'Link: http://example.com/link6',
+         'Link: http://example.com/link5',
+         'Link: http://example.com/link4',
+         'Link: http://example.com/link3',
+         'Link: http://example.com/movedTemporarily',
+         'Link: http://example.com/movedPermanently',
+         'Link: http://example.org/link2',
+         'Link: http://example.com/link1'],
         []);
       test.done();
     });
@@ -148,14 +175,45 @@ exports.checkPages = {
   checkLinksOnlySameDomainLinks: function(test) {
     test.expect(4);
     nockFiles(['externalLink.html']);
-    nockLinks(['okLink']);
+    nockLinks(['link']);
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/externalLink.html'],
       checkLinks: true,
       onlySameDomainLinks: true
     }, function() {
       outputs(test, gruntMock,
-        ['Page: http://example.com/externalLink.html', 'Link: http://example.com/okLink'],
+        ['Page: http://example.com/externalLink.html', 'Link: http://example.com/link'],
+        []);
+      test.done();
+    });
+    checkPages(gruntMock);
+  },
+
+  checkLinksDisallowRedirect: function(test) {
+    test.expect(5);
+    nockFiles(['redirectLink.html']);
+    nockRedirect('redirect');
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/redirectLink.html'],
+      checkLinks: true,
+      disallowRedirect: true
+    });
+    checkPagesThrows(test, gruntMock,
+        ['Page: http://example.com/redirectLink.html'],
+        ['Bad link (301): http://example.com/redirect']);
+  },
+
+  checkLinksLinksToIgnore: function(test) {
+    test.expect(6);
+    nockFiles(['ignoreLinks.html']);
+    nockLinks(['link0', 'link1', 'link2']);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/ignoreLinks.html'],
+      checkLinks: true,
+      linksToIgnore: ['http://example.com/ignore0', 'http://example.com/ignore1']
+    }, function() {
+      outputs(test, gruntMock,
+        ['Page: http://example.com/ignoreLinks.html', 'Link: http://example.com/link2', 'Link: http://example.com/link1', 'Link: http://example.com/link0'],
         []);
       test.done();
     });
@@ -186,7 +244,7 @@ exports.checkPages = {
       pageUrls: ['http://example.com/unclosedElement.html'],
       checkXhtml: true
     });
-    throwsWrapper(test, gruntMock,
+    checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/unclosedElement.html'],
       ['Unexpected close tag, Line: 5, Column: 7, Char: >', '1 XHTML parse error(s), see above']);
   },
@@ -198,7 +256,7 @@ exports.checkPages = {
       pageUrls: ['http://example.com/unclosedImg.html'],
       checkXhtml: true
     });
-    throwsWrapper(test, gruntMock,
+    checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/unclosedImg.html'],
       ['Unexpected close tag, Line: 4, Column: 7, Char: >', '1 XHTML parse error(s), see above']);
   },
@@ -210,7 +268,7 @@ exports.checkPages = {
       pageUrls: ['http://example.com/invalidEntity.html'],
       checkXhtml: true
     });
-    throwsWrapper(test, gruntMock,
+    checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/invalidEntity.html'],
       ['Invalid character entity, Line: 3, Column: 21, Char: ;', '1 XHTML parse error(s), see above']);
   },
@@ -222,7 +280,7 @@ exports.checkPages = {
       pageUrls: ['http://example.com/multipleErrors.html'],
       checkXhtml: true
     });
-    throwsWrapper(test, gruntMock,
+    checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/multipleErrors.html'],
       ['Invalid character entity, Line: 4, Column: 23, Char: ;', 'Unexpected close tag, Line: 5, Column: 6, Char: >', '2 XHTML parse error(s), see above']);
   },
