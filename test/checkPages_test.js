@@ -163,27 +163,27 @@ exports.checkPages = {
   pageNotFound: function(test) {
     test.expect(4);
     nock('http://example.com')
-      .get('/notFound.html')
+      .get('/notFound')
       .reply(404);
     var gruntMock = new GruntMock([], {
-      pageUrls: ['http://example.com/notFound.html']
+      pageUrls: ['http://example.com/notFound']
     });
-    throwsWrapper(test, gruntMock, [], ['Bad page (404): http://example.com/notFound.html']);
+    throwsWrapper(test, gruntMock, [], ['Bad page (404): http://example.com/notFound']);
   },
 
   /* checkLinks */
 
   checkLinksValid: function(test) {
-    test.expect(5);
+    test.expect(17);
     nockFiles(['validPage.html']);
-    nockLinks(['okLink']);
+    nockLinks(['okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink', 'okLink']);
     nockLinks(['okLink'], 'http://example.org');
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/validPage.html'],
       checkLinks: true
     }, function() {
       outputs(test, gruntMock,
-        ['Page: http://example.com/validPage.html', 'Link: http://example.org/okLink', 'Link: http://example.com/okLink'],
+        ['Page: http://example.com/validPage.html', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.com/okLink', 'Link: http://example.org/okLink', 'Link: http://example.com/okLink'],
         []);
       test.done();
     });
