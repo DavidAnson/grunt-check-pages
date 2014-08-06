@@ -115,7 +115,7 @@ module.exports = function(grunt) {
   }
 
   // Register the task with Grunt
-  grunt.registerMultiTask('checkPages', 'Checks various aspects of a web page for validity.', function() {
+  grunt.registerMultiTask('checkPages', 'Checks various aspects of a web page for correctness.', function() {
 
     // Check for unsupported use
     if (this.files.length) {
