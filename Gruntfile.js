@@ -12,6 +12,8 @@ module.exports = function(grunt) {
 
   // Project configuration
   grunt.initConfig({
+
+    // Linting
     jshint: {
       all: [
         'Gruntfile.js',
@@ -36,6 +38,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
 
-  // By default, run tests and lint
+  // Default: Test and lint
   grunt.registerTask('default', ['nodeunit', 'jshint']);
 };
