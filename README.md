@@ -5,7 +5,8 @@
 ## Getting Started
 This plugin requires Grunt `~0.4.5`
 
-If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
+If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins.
+Once you're familiar with that process, you may install this plugin with this command:
 
 ```shell
 npm install grunt-check-pages --save-dev
@@ -21,15 +22,24 @@ grunt.loadNpmTasks('grunt-check-pages');
 
 ### Overview
 In your project's Gruntfile, add a section named `checkPages` to the data object passed into `grunt.initConfig()`.
+The following example includes all supported options:
 
 ```js
 grunt.initConfig({
   checkPages: {
     options: {
-      // Task-specific options go here.
-    },
-    your_target: {
-      // Target-specific file lists and/or options go here.
+      pageUrls: [
+        "http://example.com/",
+        "http://example.com/blog",
+        "http://example.com/about.html"
+      ],
+      checkLinks: true,
+      onlySameDomainLinks: true,
+      disallowRedirect: false,
+      linksToIgnore: [
+        "http://example.com/broken.html"
+      ],
+      checkXhtml: true
     },
   },
 });
@@ -37,53 +47,63 @@ grunt.initConfig({
 
 ### Options
 
-#### options.separator
-Type: `String`
-Default value: `',  '`
+#### options.pageUrls
+Type: `Array` of `String`
+Default value: `null`
+*Required*
 
-A string value that is used to do something with whatever.
+`pageUrls` specifies the list of URLs identifying pages for the task to check.
+URLs must be absolute and can point to local or remote content.
+`pageUrls` can be empty, but must be present.
 
-#### options.punctuation
-Type: `String`
-Default value: `'.'`
+#### options.checkLinks
+Type: `Boolean`
+Default value: `false`
 
-A string value that is used to do something else with whatever else.
+Enabling `checkLinks` causes each link in the page to be checked for validity (i.e., an HTTP HEAD request returns 200/OK).
+The following element/attribute pairs are supported:
+* `a`/`href`
+* `area`/`href`
+* `audio`/`src`
+* `embed`/`src`
+* `iframe`/`src`
+* `img`/`src`
+* `input`/`src`
+* `link`/`href`
+* `object`/`data`
+* `script`/`src`
+* `source`/`src`
+* `track`/`src`
+* `video`/`src`
 
-### Usage Examples
+#### options.onlySameDomainLinks
+Type: `Boolean`
+Default value: `false`
 
-#### Default Options
-In this example, the default options are used to do something with whatever. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result would be `Testing, 1 2 3.`
+...
 
-```js
-grunt.initConfig({
-  checkPages: {
-    options: {},
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
+#### options.disallowRedirect
+Type: `Boolean`
+Default value: `false`
 
-#### Custom Options
-In this example, custom options are used to do something else with whatever else. So if the `testing` file has the content `Testing` and the `123` file had the content `1 2 3`, the generated result in this case would be `Testing: 1 2 3 !!!`
+...
 
-```js
-grunt.initConfig({
-  checkPages: {
-    options: {
-      separator: ': ',
-      punctuation: ' !!!',
-    },
-    files: {
-      'dest/default_options': ['src/testing', 'src/123'],
-    },
-  },
-});
-```
+#### options.linksToIgnore
+Type: `Array` of `String`
+Default value: `null`
+
+...
+
+#### options.checkXhtml
+Type: `Boolean`
+Default value: `false`
+
+...
 
 ## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
+In lieu of a formal styleguide, take care to maintain the existing coding style.
+Add unit tests for any new or changed functionality.
+Lint and test your code using [Grunt](http://gruntjs.com/).
 
 ## Release History
 _(Nothing yet)_
