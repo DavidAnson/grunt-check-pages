@@ -18,6 +18,7 @@ module.exports = function(grunt) {
   // Global variables
   var userAgent = 'grunt-check-pages/' + require('../package.json').version;
   var pendingCallbacks = [];
+  var errorCount = 0;
 
   // Returns true if and only if the specified link is on the list to ignore
   function isLinkIgnored(link, options) {
@@ -50,9 +51,11 @@ module.exports = function(grunt) {
         .set('User-Agent', userAgent)
         .end(function(err, res) {
           if (err) {
-            grunt.fail.warn('Page error: ' + err);
+            grunt.log.warn('Page error: ' + err);
+            errorCount++;
           } else if (!res.ok) {
-            grunt.fail.warn('Bad page (' + res.status + '): ' + page);
+            grunt.log.warn('Bad page (' + res.status + '): ' + page);
+            errorCount++;
           } else {
             grunt.log.ok('Page: ' + page);
             if (options.checkLinks) {
@@ -76,16 +79,12 @@ module.exports = function(grunt) {
             if (options.checkXhtml) {
 
               // Check the page's structure for XHTML compliance
-              var errors = 0;
               var parser = sax.parser(true);
               parser.onerror = function(error) {
                 grunt.log.warn(error.message.replace(/\n/g, ', '));
-                errors++;
+                errorCount++;
               };
               parser.write(res.text);
-              if (errors) {
-                grunt.fail.warn(errors + ' XHTML parse error' + (1 < errors ? 's' : '') + ', see above');
-              }
             }
           }
           callback();
@@ -101,9 +100,11 @@ module.exports = function(grunt) {
         .set('User-Agent', userAgent)
         .end(function(err, res) {
           if (err) {
-            grunt.fail.warn('Link error: ' + err);
+            grunt.log.warn('Link error: ' + err);
+            errorCount++;
           } else if (!res.ok) {
-            grunt.fail.warn('Bad link (' + res.status + '): ' + link);
+            grunt.log.warn('Bad link (' + res.status + '): ' + link);
+            errorCount++;
           } else {
             grunt.log.ok('Link: ' + link);
           }
@@ -150,7 +151,13 @@ module.exports = function(grunt) {
     });
 
     // Queue 'done' callback
-    pendingCallbacks.push(this.async());
+    var done = this.async();
+    pendingCallbacks.push(function() {
+      if (errorCount) {
+        grunt.fail.warn(errorCount + ' error' + (1 < errorCount ? 's' : '') + ', see above');
+      }
+      done();
+    });
 
     // Process the queue
     var next = function() {
