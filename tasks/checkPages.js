@@ -19,14 +19,14 @@ module.exports = function(grunt) {
   var userAgent = 'grunt-check-pages/' + require('../package.json').version;
   var pendingCallbacks = [];
 
-  // Returns true iff the specified link is on the list to ignore
+  // Returns true if and only if the specified link is on the list to ignore
   function isLinkIgnored(link, options) {
     return options.linksToIgnore.some(function(isLinkIgnored) {
       return (isLinkIgnored === link);
     });
   }
 
-  // Adds pending callbacks for all links matching <element attribute='...'/>
+  // Adds pending callbacks for all links matching <element attribute='*'/>
   function addLinks($, element, attribute, base, options) {
     var baseHostname = url.parse(base).hostname;
     $(element).each(function() {
@@ -35,7 +35,8 @@ module.exports = function(grunt) {
         var resolvedLink = url.resolve(base, link);
         if((!options.onlySameDomainLinks || (url.parse(resolvedLink).hostname === baseHostname)) &&
            !isLinkIgnored(resolvedLink, options)) {
-          pendingCallbacks.unshift(testLink(resolvedLink, options)); // Add to front of queue so it gets processed before the next page
+          // Add to front of queue so it gets processed before the next page
+          pendingCallbacks.unshift(testLink(resolvedLink, options));
         }
       }
     });
@@ -140,7 +141,7 @@ module.exports = function(grunt) {
     }
     options.checkXhtml = !!options.checkXhtml;
     if (!options.checkLinks && !options.checkXhtml) {
-      grunt.fail.warn('nothing to do; enable one or more of [checkLinks, checkXhtml]');
+      grunt.fail.warn('nothing to do; enable one or more of: checkLinks, checkXhtml');
     }
 
     // Queue callbacks for each page

@@ -108,7 +108,7 @@ exports.checkPages = {
   noActionOption: function(test) {
     test.expect(4);
     var gruntMock = new GruntMock([], { pageUrls: ['http://example.com/'] });
-    checkPagesThrows(test, gruntMock, [], ['nothing to do; enable one or more of [checkLinks, checkXhtml]']);
+    checkPagesThrows(test, gruntMock, [], ['nothing to do; enable one or more of: checkLinks, checkXhtml']);
   },
 
   /* Basic functionality */
