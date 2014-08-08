@@ -93,22 +93,27 @@ module.exports = function(grunt) {
   }
 
   // Returns a callback to test the specified link
-  function testLink(link, options) {
+  function testLink(link, options, retryWithGet) {
     return function (callback) {
       var req = request
-        .head(link)
+        [retryWithGet ? 'get' : 'head'](link)
         .set('User-Agent', userAgent)
         .end(function(err, res) {
-          if (err) {
-            grunt.log.warn('Link error: ' + err);
-            errorCount++;
-          } else if (!res.ok) {
-            grunt.log.warn('Bad link (' + res.status + '): ' + link);
-            errorCount++;
+          if (!err && !res.ok && !retryWithGet) {
+            // Retry HEAD request as GET to be sure
+            testLink(link, options, true)(callback);
           } else {
-            grunt.log.ok('Link: ' + link);
+            if (err) {
+              grunt.log.warn('Link error: ' + err);
+              errorCount++;
+            } else if (!res.ok) {
+              grunt.log.warn('Bad link (' + res.status + '): ' + link);
+              errorCount++;
+            } else {
+              grunt.log.ok('Link: ' + link);
+            }
+            callback();
           }
-          callback();
         });
       if (options.disallowRedirect) {
         req.redirects(0);

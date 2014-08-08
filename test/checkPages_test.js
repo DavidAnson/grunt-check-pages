@@ -69,12 +69,12 @@ function nockLinks(links, base) {
   });
 }
 function nockRedirect(link, status) {
+  var slashLink = '/' + link;
   nock('http://example.com')
-    .head('/' + link)
-    .reply(
-      status || 301,
-      '',
-      { 'Location': '/' + link + '_redirected' });
+    .head(slashLink)
+    .reply(status || 301, '', { 'Location': slashLink + '_redirected' })
+    .get(slashLink)
+    .reply(status || 301, '', { 'Location': slashLink + '_redirected' });
 }
 
 exports.checkPages = {
@@ -186,7 +186,9 @@ exports.checkPages = {
     nockLinks(['link0', 'link1', 'link2']);
     nock('http://example.com')
       .head('/broken0').reply(404)
-      .head('/broken1').reply(500);
+      .get('/broken0').reply(404)
+      .head('/broken1').reply(500)
+      .get('/broken1').reply(500);
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/brokenLinks.html'],
       checkLinks: true
@@ -199,6 +201,25 @@ exports.checkPages = {
       ['Bad link (500): http://example.com/broken1',
        'Bad link (404): http://example.com/broken0',
        '2 errors, see above']);
+  },
+
+  checkLinksRetryWhenHeadFails: function(test) {
+    test.expect(4);
+    nockFiles(['retryWhenHeadFails.html']);
+    nock('http://example.com')
+      .head('/link').reply(500)
+      .get('/link').reply(200, '', { 'Content-Type': 'text/html' });
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/retryWhenHeadFails.html'],
+      checkLinks: true
+    }, function() {
+      testOutput(test, gruntMock,
+        ['Page: http://example.com/retryWhenHeadFails.html',
+         'Link: http://example.com/link'],
+        []);
+      test.done();
+    });
+    checkPages(gruntMock);
   },
 
   checkLinksOnlySameDomainLinks: function(test) {
