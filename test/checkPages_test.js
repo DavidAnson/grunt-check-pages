@@ -135,7 +135,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock,
       [],
       ['Bad page (404): http://example.com/notFound',
-       '1 error, see above']);
+       '1 issue, see above']);
   },
 
   /* checkLinks functionality */
@@ -200,7 +200,7 @@ exports.checkPages = {
        'Link: http://example.com/link0'],
       ['Bad link (500): http://example.com/broken1',
        'Bad link (404): http://example.com/broken0',
-       '2 errors, see above']);
+       '2 issues, see above']);
   },
 
   checkLinksRetryWhenHeadFails: function(test) {
@@ -251,7 +251,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/redirectLink.html'],
       ['Bad link (301): http://example.com/redirect',
-       '1 error, see above']);
+       '1 issue, see above']);
   },
 
   checkLinksLinksToIgnore: function(test) {
@@ -329,7 +329,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/unclosedElement.html'],
       ['Unexpected close tag, Line: 5, Column: 7, Char: >',
-       '1 error, see above']);
+       '1 issue, see above']);
   },
 
   checkXhtmlUnclosedImg: function(test) {
@@ -342,7 +342,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/unclosedImg.html'],
       ['Unexpected close tag, Line: 4, Column: 7, Char: >',
-       '1 error, see above']);
+       '1 issue, see above']);
   },
 
   checkXhtmlInvalidEntity : function(test) {
@@ -355,7 +355,7 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock,
       ['Page: http://example.com/invalidEntity.html'],
       ['Invalid character entity, Line: 3, Column: 21, Char: ;',
-       '1 error, see above']);
+       '1 issue, see above']);
   },
 
   checkXhtmlMultipleErrors : function(test) {
@@ -369,6 +369,6 @@ exports.checkPages = {
       ['Page: http://example.com/multipleErrors.html'],
       ['Invalid character entity, Line: 4, Column: 23, Char: ;',
        'Unexpected close tag, Line: 5, Column: 6, Char: >',
-       '2 errors, see above']);
+       '2 issues, see above']);
   },
 };

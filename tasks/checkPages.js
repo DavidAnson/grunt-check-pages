@@ -18,7 +18,7 @@ module.exports = function(grunt) {
   // Global variables
   var userAgent = 'grunt-check-pages/' + require('../package.json').version;
   var pendingCallbacks = [];
-  var errorCount = 0;
+  var issueCount = 0;
 
   // Returns true if and only if the specified link is on the list to ignore
   function isLinkIgnored(link, options) {
@@ -52,10 +52,10 @@ module.exports = function(grunt) {
         .end(function(err, res) {
           if (err) {
             grunt.log.warn('Page error: ' + err);
-            errorCount++;
+            issueCount++;
           } else if (!res.ok) {
             grunt.log.warn('Bad page (' + res.status + '): ' + page);
-            errorCount++;
+            issueCount++;
           } else {
             grunt.log.ok('Page: ' + page);
             if (options.checkLinks) {
@@ -82,7 +82,7 @@ module.exports = function(grunt) {
               var parser = sax.parser(true);
               parser.onerror = function(error) {
                 grunt.log.warn(error.message.replace(/\n/g, ', '));
-                errorCount++;
+                issueCount++;
               };
               parser.write(res.text);
             }
@@ -105,10 +105,10 @@ module.exports = function(grunt) {
           } else {
             if (err) {
               grunt.log.warn('Link error: ' + err);
-              errorCount++;
+              issueCount++;
             } else if (!res.ok) {
               grunt.log.warn('Bad link (' + res.status + '): ' + link);
-              errorCount++;
+              issueCount++;
             } else {
               grunt.log.ok('Link: ' + link);
             }
@@ -158,8 +158,8 @@ module.exports = function(grunt) {
     // Queue 'done' callback
     var done = this.async();
     pendingCallbacks.push(function() {
-      if (errorCount) {
-        grunt.fail.warn(errorCount + ' error' + (1 < errorCount ? 's' : '') + ', see above');
+      if (issueCount) {
+        grunt.fail.warn(issueCount + ' issue' + (1 < issueCount ? 's' : '') + ', see above');
       }
       done();
     });
