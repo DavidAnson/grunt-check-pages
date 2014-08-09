@@ -4,6 +4,7 @@
 
 
 ## Getting Started
+
 This plugin requires Grunt `~0.4.4`
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
@@ -23,6 +24,7 @@ grunt.loadNpmTasks('grunt-check-pages');
 
 
 ### Overview
+
 An important aspect of creating web sites is to validate the structure and content of their pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
 
 By providing a list of pages to scan, the task can:
@@ -32,6 +34,7 @@ By providing a list of pages to scan, the task can:
 
 
 ### Usage
+
 In your project's Gruntfile, add a section named `checkPages` to the data object passed into `grunt.initConfig()`.
 The following example includes all supported options:
 
@@ -73,8 +76,9 @@ grunt.initConfig({
 ### Options
 
 #### pageUrls
-Type: `Array` of `String`
-Default value: `null`
+
+Type: `Array` of `String`  
+Default value: `null`  
 *Required*
 
 `pageUrls` specifies a list of URLs for web pages the task will check.
@@ -82,7 +86,8 @@ Default value: `null`
 URLs must be absolute and can point to local or remote content. The `pageUrls` array can be empty, but must be present.
 
 #### checkLinks
-Type: `Boolean`
+
+Type: `Boolean`  
 Default value: `false`
 
 Enabling `checkLinks` causes each link in a page to be checked for validity (i.e., an [HTTP HEAD or GET request](http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods) returns success).
@@ -106,8 +111,9 @@ The following element/attribute pairs are used to identify links:
 * `video`/`src`
 
 #### onlySameDomainLinks
-Type: `Boolean`
-Default value: `false`
+
+Type: `Boolean`  
+Default value: `false`  
 Used by: `checkLinks`
 
 Set this option to `true` to block the checking of links on different domains than the referring page.
@@ -115,8 +121,9 @@ Set this option to `true` to block the checking of links on different domains th
 This can be useful during development when external sites aren't changing and don't need to be checked.
 
 #### disallowRedirect
-Type: `Boolean`
-Default value: `false`
+
+Type: `Boolean`  
+Default value: `false`  
 Used by: `checkLinks`
 
 Set this option to `true` to block HTTP redirects by failing the task if any are encountered.
@@ -124,8 +131,9 @@ Set this option to `true` to block HTTP redirects by failing the task if any are
 This can be useful to ensure outgoing links are to the content's canonical location.
 
 #### linksToIgnore
-Type: `Array` of `String`
-Default value: `null`
+
+Type: `Array` of `String`  
+Default value: `null`  
 Used by: `checkLinks`
 
 `linksToIgnore` specifies a list of URLs that should be ignored by the link checker.
@@ -133,7 +141,8 @@ Used by: `checkLinks`
 This is useful for links that are not accessible during development or known to be unreliable.
 
 #### checkXhtml
-Type: `Boolean`
+
+Type: `Boolean`  
 Default value: `false`
 
 Enabling `checkXhtml` attempts to parse each URL's content as [XHTML](http://en.wikipedia.org/wiki/XHTML) and fails if there are any structural errors.
