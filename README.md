@@ -4,7 +4,7 @@
 
 
 ## Getting Started
-This plugin requires Grunt `~0.4.5`
+This plugin requires Grunt `~0.4.4`
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
@@ -23,7 +23,7 @@ grunt.loadNpmTasks('grunt-check-pages');
 
 
 ### Overview
-An important aspect of testing web sites is to validate the structure and content of their pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
+An important aspect of creating web sites is to validate the structure and content of their pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
 
 By providing a list of pages to scan, the task can:
 
@@ -77,7 +77,7 @@ Type: `Array` of `String`
 Default value: `null`
 *Required*
 
-`pageUrls` specifies a list of URLs for any number of web pages that the task will check.
+`pageUrls` specifies a list of URLs for web pages the task will check.
 
 URLs must be absolute and can point to local or remote content. The `pageUrls` array can be empty, but must be present.
 
@@ -85,7 +85,9 @@ URLs must be absolute and can point to local or remote content. The `pageUrls` a
 Type: `Boolean`
 Default value: `false`
 
-Enabling `checkLinks` causes each link in a page to be checked for validity (i.e., an [HTTP HEAD request](http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods) returns success).
+Enabling `checkLinks` causes each link in a page to be checked for validity (i.e., an [HTTP HEAD or GET request](http://en.wikipedia.org/wiki/Hypertext_Transfer_Protocol#Request_methods) returns success).
+
+For efficiency, a `HEAD` request is made first and a successful result validates the link. Because some web servers misbehave, a failed `HEAD` request is followed by a `GET` request to definitively validate the link.
 
 The following element/attribute pairs are used to identify links:
 
@@ -119,7 +121,7 @@ Used by: `checkLinks`
 
 Set this option to `true` to block HTTP redirects by failing the task if any are encountered.
 
-This can be useful to ensure all outgoing links are to a resource's canonical location.
+This can be useful to ensure outgoing links are to the content's canonical location.
 
 #### linksToIgnore
 Type: `Array` of `String`
@@ -134,13 +136,9 @@ This is useful for links that are not accessible during development or known to 
 Type: `Boolean`
 Default value: `false`
 
-Enabling `checkXhtml` attempts to parse each page as [XHTML](http://en.wikipedia.org/wiki/XHTML) and fails if there are any structural errors.
+Enabling `checkXhtml` attempts to parse each URL's content as [XHTML](http://en.wikipedia.org/wiki/XHTML) and fails if there are any structural errors.
 
 This can be useful to ensure a page's structure is well-formed and unambiguous for browsers.
-
-
-## Contributing
-In lieu of a formal styleguide, take care to maintain the existing coding style. Add unit tests for any new or changed functionality. Lint and test your code using [Grunt](http://gruntjs.com/).
 
 
 ## Release History
