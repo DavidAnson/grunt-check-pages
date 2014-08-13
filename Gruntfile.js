@@ -31,9 +31,6 @@ module.exports = function(grunt) {
     }
   });
 
-  // Load this plugin's task
-  grunt.loadTasks('tasks');
-
   // Load required plugins
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
