@@ -146,9 +146,6 @@ module.exports = function(grunt) {
       grunt.fail.warn('linksToIgnore option is invalid; it should be an array');
     }
     options.checkXhtml = !!options.checkXhtml;
-    if (!options.checkLinks && !options.checkXhtml) {
-      grunt.fail.warn('nothing to do; enable one or more of: checkLinks, checkXhtml');
-    }
 
     // Queue callbacks for each page
     options.pageUrls.forEach(function(page) {

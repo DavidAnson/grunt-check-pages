@@ -25,11 +25,12 @@ grunt.loadNpmTasks('grunt-check-pages');
 
 ### Overview
 
-An important aspect of creating web sites is to validate the structure and content of their pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
+An important aspect of creating a web site is to validate the structure and content of the site's pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
 
 By providing a list of pages to scan, the task can:
 
-* Validate all external links point to live content (similar to the [W3C Link Checker](http://validator.w3.org/checklink))
+* Validate each page is accessible
+* Validate all links point to accessible content (similar to the [W3C Link Checker](http://validator.w3.org/checklink))
 * Validate page structure for XHTML compliance (akin to the [W3C Markup Validation Service](http://validator.w3.org/))
 
 
@@ -154,3 +155,4 @@ This can be useful to ensure a page's structure is well-formed and unambiguous f
 
 * 0.1.0 - Initial release, support for `checkLinks` and `checkXhtml`.
 * 0.1.1 - Tweak README for better formatting.
+* *PENDING* - Support page-only mode (i.e., no link or XHTML checks).

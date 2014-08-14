@@ -105,19 +105,12 @@ exports.checkPages = {
     checkPagesThrows(test, gruntMock, [], ['linksToIgnore option is invalid; it should be an array']);
   },
 
-  noActionOption: function(test) {
-    test.expect(4);
-    var gruntMock = new GruntMock([], { pageUrls: ['http://example.com/'] });
-    checkPagesThrows(test, gruntMock, [], ['nothing to do; enable one or more of: checkLinks, checkXhtml']);
-  },
-
   /* Basic functionality */
 
   pageUrlsEmpty: function(test) {
     test.expect(2);
     var gruntMock = new GruntMock([], {
-      pageUrls: [],
-      checkLinks: true
+      pageUrls: []
     }, function() {
       testOutput(test, gruntMock, [], []);
       test.done();
@@ -125,17 +118,53 @@ exports.checkPages = {
     checkPages(gruntMock);
   },
 
-  pageNotFound: function(test) {
+  pageUrlsValid: function(test) {
+    test.expect(4);
+    nockFiles(['validPage.html', 'externalLink.html']);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/validPage.html',
+                 'http://example.com/externalLink.html']
+    }, function() {
+      testOutput(test, gruntMock,
+      ['Page: http://example.com/validPage.html',
+       'Page: http://example.com/externalLink.html'],
+       []);
+      test.done();
+    });
+    checkPages(gruntMock);
+  },
+
+  pageUrlsNotFound: function(test) {
     test.expect(5);
     nock('http://example.com').get('/notFound').reply(404);
     var gruntMock = new GruntMock([], {
-      pageUrls: ['http://example.com/notFound'],
-      checkLinks: true
+      pageUrls: ['http://example.com/notFound']
     });
     checkPagesThrows(test, gruntMock,
       [],
       ['Bad page (404): http://example.com/notFound',
        '1 issue, see above']);
+  },
+
+  pageUrlsMultiple: function(test) {
+    test.expect(9);
+    nockFiles(['validPage.html', 'externalLink.html', 'validPage.html']);
+    nock('http://example.com').get('/notFound').reply(404);
+    nock('http://example.com').get('/serverError').reply(500);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/validPage.html',
+                 'http://example.com/notFound',
+                 'http://example.com/externalLink.html',
+                 'http://example.com/serverError',
+                 'http://example.com/validPage.html']
+    });
+    checkPagesThrows(test, gruntMock,
+      ['Page: http://example.com/validPage.html',
+       'Page: http://example.com/externalLink.html',
+       'Page: http://example.com/validPage.html'],
+      ['Bad page (404): http://example.com/notFound',
+       'Bad page (500): http://example.com/serverError',
+       '2 issues, see above']);
   },
 
   /* checkLinks functionality */
