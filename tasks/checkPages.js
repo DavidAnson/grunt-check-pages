@@ -20,6 +20,11 @@ module.exports = function(grunt) {
   var pendingCallbacks = [];
   var issueCount = 0;
 
+  // Returns the elapsed time between two Date values
+  function elapsedTime(start, end) {
+    return ' (' + (end - start) + 'ms)';
+  }
+
   // Returns true if and only if the specified link is on the list to ignore
   function isLinkIgnored(link, options) {
     return options.linksToIgnore.some(function(isLinkIgnored) {
@@ -46,18 +51,20 @@ module.exports = function(grunt) {
   // Returns a callback to test the specified page
   function testPage(page, options) {
     return function (callback) {
+      var start = Date.now();
       request
         .get(page)
         .set('User-Agent', userAgent)
         .end(function(err, res) {
+          var end = Date.now();
           if (err) {
-            grunt.log.warn('Page error: ' + err);
+            grunt.log.warn('Page error: ' + err + elapsedTime(start, end));
             issueCount++;
           } else if (!res.ok) {
-            grunt.log.warn('Bad page (' + res.status + '): ' + page);
+            grunt.log.warn('Bad page (' + res.status + '): ' + page + elapsedTime(start, end));
             issueCount++;
           } else {
-            grunt.log.ok('Page: ' + page);
+            grunt.log.ok('Page: ' + page + elapsedTime(start, end));
             if (options.checkLinks) {
 
               // Check the page's links for validity (i.e., HTTP HEAD returns OK)
@@ -95,22 +102,24 @@ module.exports = function(grunt) {
   // Returns a callback to test the specified link
   function testLink(link, options, retryWithGet) {
     return function (callback) {
+      var start = Date.now();
       var req = request
         [retryWithGet ? 'get' : 'head'](link)
         .set('User-Agent', userAgent)
         .end(function(err, res) {
+          var end = Date.now();
           if (!err && !res.ok && !retryWithGet) {
             // Retry HEAD request as GET to be sure
             testLink(link, options, true)(callback);
           } else {
             if (err) {
-              grunt.log.warn('Link error: ' + err);
+              grunt.log.warn('Link error: ' + err + elapsedTime(start, end));
               issueCount++;
             } else if (!res.ok) {
-              grunt.log.warn('Bad link (' + res.status + '): ' + link);
+              grunt.log.warn('Bad link (' + res.status + '): ' + link + elapsedTime(start, end));
               issueCount++;
             } else {
-              grunt.log.ok('Link: ' + link);
+              grunt.log.ok('Link: ' + link + elapsedTime(start, end));
             }
             callback();
           }

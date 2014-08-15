@@ -30,11 +30,11 @@ function throws(test, block, message, assertions) {
 function testOutput(test, gruntMock, oks, warns) {
   test.equal(gruntMock.oks.length, oks.length);
   while(oks.length) {
-    test.equal(gruntMock.oks.shift(), oks.shift());
+    test.equal(gruntMock.oks.shift().replace(/\d+ms/, '00ms'), oks.shift());
   }
   test.equal(gruntMock.warns.length, warns.length);
   while(warns.length) {
-    test.equal(gruntMock.warns.shift(), warns.shift());
+    test.equal(gruntMock.warns.shift().replace(/\d+ms/, '00ms'), warns.shift());
   }
 }
 
@@ -126,8 +126,8 @@ exports.checkPages = {
                  'http://example.com/externalLink.html']
     }, function() {
       testOutput(test, gruntMock,
-      ['Page: http://example.com/validPage.html',
-       'Page: http://example.com/externalLink.html'],
+      ['Page: http://example.com/validPage.html (00ms)',
+       'Page: http://example.com/externalLink.html (00ms)'],
        []);
       test.done();
     });
@@ -142,7 +142,7 @@ exports.checkPages = {
     });
     checkPagesThrows(test, gruntMock,
       [],
-      ['Bad page (404): http://example.com/notFound',
+      ['Bad page (404): http://example.com/notFound (00ms)',
        '1 issue, see above']);
   },
 
@@ -159,11 +159,11 @@ exports.checkPages = {
                  'http://example.com/validPage.html']
     });
     checkPagesThrows(test, gruntMock,
-      ['Page: http://example.com/validPage.html',
-       'Page: http://example.com/externalLink.html',
-       'Page: http://example.com/validPage.html'],
-      ['Bad page (404): http://example.com/notFound',
-       'Bad page (500): http://example.com/serverError',
+      ['Page: http://example.com/validPage.html (00ms)',
+       'Page: http://example.com/externalLink.html (00ms)',
+       'Page: http://example.com/validPage.html (00ms)'],
+      ['Bad page (404): http://example.com/notFound (00ms)',
+       'Bad page (500): http://example.com/serverError (00ms)',
        '2 issues, see above']);
   },
 
@@ -186,23 +186,23 @@ exports.checkPages = {
       checkLinks: true
     }, function() {
       testOutput(test, gruntMock,
-        ['Page: http://example.com/validPage.html',
-         'Link: http://example.com/link13',
-         'Link: http://example.com/link12',
-         'Link: http://example.com/link11',
-         'Link: http://example.com/link10',
-         'Link: http://example.com/link9',
-         'Link: http://example.com/link0',
-         'Link: http://example.com/link8',
-         'Link: http://example.com/link7',
-         'Link: http://example.com/link6',
-         'Link: http://example.com/link5',
-         'Link: http://example.com/link4',
-         'Link: http://example.com/link3',
-         'Link: http://example.com/movedTemporarily',
-         'Link: http://example.com/movedPermanently',
-         'Link: http://example.org/link2',
-         'Link: http://example.com/link1'],
+        ['Page: http://example.com/validPage.html (00ms)',
+         'Link: http://example.com/link13 (00ms)',
+         'Link: http://example.com/link12 (00ms)',
+         'Link: http://example.com/link11 (00ms)',
+         'Link: http://example.com/link10 (00ms)',
+         'Link: http://example.com/link9 (00ms)',
+         'Link: http://example.com/link0 (00ms)',
+         'Link: http://example.com/link8 (00ms)',
+         'Link: http://example.com/link7 (00ms)',
+         'Link: http://example.com/link6 (00ms)',
+         'Link: http://example.com/link5 (00ms)',
+         'Link: http://example.com/link4 (00ms)',
+         'Link: http://example.com/link3 (00ms)',
+         'Link: http://example.com/movedTemporarily (00ms)',
+         'Link: http://example.com/movedPermanently (00ms)',
+         'Link: http://example.org/link2 (00ms)',
+         'Link: http://example.com/link1 (00ms)'],
         []);
       test.done();
     });
@@ -223,12 +223,12 @@ exports.checkPages = {
       checkLinks: true
     });
     checkPagesThrows(test, gruntMock,
-      ['Page: http://example.com/brokenLinks.html',
-       'Link: http://example.com/link2',
-       'Link: http://example.com/link1',
-       'Link: http://example.com/link0'],
-      ['Bad link (500): http://example.com/broken1',
-       'Bad link (404): http://example.com/broken0',
+      ['Page: http://example.com/brokenLinks.html (00ms)',
+       'Link: http://example.com/link2 (00ms)',
+       'Link: http://example.com/link1 (00ms)',
+       'Link: http://example.com/link0 (00ms)'],
+      ['Bad link (500): http://example.com/broken1 (00ms)',
+       'Bad link (404): http://example.com/broken0 (00ms)',
        '2 issues, see above']);
   },
 
@@ -243,8 +243,8 @@ exports.checkPages = {
       checkLinks: true
     }, function() {
       testOutput(test, gruntMock,
-        ['Page: http://example.com/retryWhenHeadFails.html',
-         'Link: http://example.com/link'],
+        ['Page: http://example.com/retryWhenHeadFails.html (00ms)',
+         'Link: http://example.com/link (00ms)'],
         []);
       test.done();
     });
@@ -261,7 +261,8 @@ exports.checkPages = {
       onlySameDomainLinks: true
     }, function() {
       testOutput(test, gruntMock,
-        ['Page: http://example.com/externalLink.html', 'Link: http://example.com/link'],
+        ['Page: http://example.com/externalLink.html (00ms)',
+         'Link: http://example.com/link (00ms)'],
         []);
       test.done();
     });
@@ -278,8 +279,8 @@ exports.checkPages = {
       disallowRedirect: true
     });
     checkPagesThrows(test, gruntMock,
-      ['Page: http://example.com/redirectLink.html'],
-      ['Bad link (301): http://example.com/redirect',
+      ['Page: http://example.com/redirectLink.html (00ms)'],
+      ['Bad link (301): http://example.com/redirect (00ms)',
        '1 issue, see above']);
   },
 
@@ -293,10 +294,10 @@ exports.checkPages = {
       linksToIgnore: ['http://example.com/ignore0', 'http://example.com/ignore1']
     }, function() {
       testOutput(test, gruntMock,
-        ['Page: http://example.com/ignoreLinks.html',
-         'Link: http://example.com/link2',
-         'Link: http://example.com/link1',
-         'Link: http://example.com/link0'],
+        ['Page: http://example.com/ignoreLinks.html (00ms)',
+         'Link: http://example.com/link2 (00ms)',
+         'Link: http://example.com/link1 (00ms)',
+         'Link: http://example.com/link0 (00ms)'],
         []);
       test.done();
     });
@@ -317,14 +318,14 @@ exports.checkPages = {
       linksToIgnore: ['http://example.com/ignore0', 'http://example.com/ignore1']
     }, function() {
       testOutput(test, gruntMock,
-        ['Page: http://example.com/externalLink.html',
-         'Link: http://example.com/link',
-         'Page: http://example.com/redirectLink.html',
-         'Link: http://example.com/redirect',
-         'Page: http://example.com/ignoreLinks.html',
-         'Link: http://example.com/link2',
-         'Link: http://example.com/link1',
-         'Link: http://example.com/link0'],
+        ['Page: http://example.com/externalLink.html (00ms)',
+         'Link: http://example.com/link (00ms)',
+         'Page: http://example.com/redirectLink.html (00ms)',
+         'Link: http://example.com/redirect (00ms)',
+         'Page: http://example.com/ignoreLinks.html (00ms)',
+         'Link: http://example.com/link2 (00ms)',
+         'Link: http://example.com/link1 (00ms)',
+         'Link: http://example.com/link0 (00ms)'],
         []);
       test.done();
     });
@@ -341,7 +342,7 @@ exports.checkPages = {
       checkXhtml: true
     }, function() {
       testOutput(test, gruntMock,
-        ['Page: http://example.com/validPage.html'],
+        ['Page: http://example.com/validPage.html (00ms)'],
         []);
       test.done();
     });
@@ -356,7 +357,7 @@ exports.checkPages = {
       checkXhtml: true
     });
     checkPagesThrows(test, gruntMock,
-      ['Page: http://example.com/unclosedElement.html'],
+      ['Page: http://example.com/unclosedElement.html (00ms)'],
       ['Unexpected close tag, Line: 5, Column: 7, Char: >',
        '1 issue, see above']);
   },
@@ -369,7 +370,7 @@ exports.checkPages = {
       checkXhtml: true
     });
     checkPagesThrows(test, gruntMock,
-      ['Page: http://example.com/unclosedImg.html'],
+      ['Page: http://example.com/unclosedImg.html (00ms)'],
       ['Unexpected close tag, Line: 4, Column: 7, Char: >',
        '1 issue, see above']);
   },
@@ -382,7 +383,7 @@ exports.checkPages = {
       checkXhtml: true
     });
     checkPagesThrows(test, gruntMock,
-      ['Page: http://example.com/invalidEntity.html'],
+      ['Page: http://example.com/invalidEntity.html (00ms)'],
       ['Invalid character entity, Line: 3, Column: 21, Char: ;',
        '1 issue, see above']);
   },
@@ -395,7 +396,7 @@ exports.checkPages = {
       checkXhtml: true
     });
     checkPagesThrows(test, gruntMock,
-      ['Page: http://example.com/multipleErrors.html'],
+      ['Page: http://example.com/multipleErrors.html (00ms)'],
       ['Invalid character entity, Line: 4, Column: 23, Char: ;',
        'Unexpected close tag, Line: 5, Column: 6, Char: >',
        '2 issues, see above']);
