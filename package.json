@@ -1,7 +1,7 @@
 {
   "name": "grunt-check-pages",
   "description": "Checks various aspects of a web page for correctness.",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "homepage": "https://github.com/DavidAnson/grunt-check-pages",
   "author": {
     "name": "David Anson",
@@ -35,7 +35,7 @@
     "grunt": "~0.4.5",
     "grunt-contrib-jshint": "^0.10.0",
     "grunt-contrib-nodeunit": "^0.4.1",
-    "nock": "^0.43.0"
+    "nock": "^0.44.3"
   },
   "peerDependencies": {
     "grunt": "~0.4.4"
