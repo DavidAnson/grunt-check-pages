@@ -15,10 +15,24 @@ module.exports = function(grunt) {
   var cheerio = require('cheerio');
   var sax = require('sax');
 
+  // Patch the Node.js version of superagent's Request which is missing 'use'
+  request.Request.prototype.use = function(fn) {
+    fn(this);
+    return this;
+  };
+
   // Global variables
   var userAgent = 'grunt-check-pages/' + require('../package.json').version;
   var pendingCallbacks = [];
   var issueCount = 0;
+
+  // Set common request headers
+  function setCommonHeaders(req) {
+    req
+      .set('User-Agent', userAgent)
+      .set('Cache-Control', 'no-cache')
+      .set('Pragma', 'no-cache');
+  }
 
   // Returns the elapsed time between two Date values
   function elapsedTime(start, end) {
@@ -54,7 +68,7 @@ module.exports = function(grunt) {
       var start = Date.now();
       request
         .get(page)
-        .set('User-Agent', userAgent)
+        .use(setCommonHeaders)
         .end(function(err, res) {
           var end = Date.now();
           if (err) {
@@ -105,7 +119,7 @@ module.exports = function(grunt) {
       var start = Date.now();
       var req = request
         [retryWithGet ? 'get' : 'head'](link)
-        .set('User-Agent', userAgent)
+        .use(setCommonHeaders)
         .end(function(err, res) {
           var end = Date.now();
           if (!err && !res.ok && !retryWithGet) {

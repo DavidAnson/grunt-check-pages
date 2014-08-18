@@ -401,4 +401,37 @@ exports.checkPages = {
        'Unexpected close tag, Line: 5, Column: 6, Char: >',
        '2 issues, see above']);
   },
+
+  /* Nock configuration  */
+
+  requestHeaders: function(test) {
+    test.expect(4);
+    nock('http://example.com')
+      .matchHeader('User-Agent', 'grunt-check-pages/0.1.2')
+      .matchHeader('Cache-Control', 'no-cache')
+      .matchHeader('Pragma', 'no-cache')
+      .get('/page')
+      .reply(
+        200,
+        '<html><body><a href="link">link</a></body></html>',
+        { 'Content-Type': 'text/html' });
+    nock('http://example.com')
+      .matchHeader('User-Agent', 'grunt-check-pages/0.1.2')
+      .matchHeader('Cache-Control', 'no-cache')
+      .matchHeader('Pragma', 'no-cache')
+      .head('/link')
+      .reply(200);
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/page'],
+      checkLinks: true,
+      checkXhtml: true
+    }, function() {
+      testOutput(test, gruntMock,
+        ['Page: http://example.com/page (00ms)',
+         'Link: http://example.com/link (00ms)'],
+        []);
+      test.done();
+    });
+    checkPages(gruntMock);
+  },
 };

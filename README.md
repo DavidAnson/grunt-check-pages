@@ -156,3 +156,4 @@ This can be useful to ensure a page's structure is well-formed and unambiguous f
 * 0.1.0 - Initial release, support for `checkLinks` and `checkXhtml`.
 * 0.1.1 - Tweak README for better formatting.
 * 0.1.2 - Support page-only mode (no link or XHTML checks), show response time for requests.
+* *PENDING* - Add "no-cache" header to requests.
