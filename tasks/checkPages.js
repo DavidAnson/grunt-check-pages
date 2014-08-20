@@ -34,11 +34,6 @@ module.exports = function(grunt) {
       .set('Pragma', 'no-cache');
   }
 
-  // Returns the elapsed time between two Date values
-  function elapsedTime(start, end) {
-    return ' (' + (end - start) + 'ms)';
-  }
-
   // Returns true if and only if the specified link is on the list to ignore
   function isLinkIgnored(link, options) {
     return options.linksToIgnore.some(function(isLinkIgnored) {
@@ -70,15 +65,15 @@ module.exports = function(grunt) {
         .get(page)
         .use(setCommonHeaders)
         .end(function(err, res) {
-          var end = Date.now();
+          var elapsed = Date.now() - start;
           if (err) {
-            grunt.log.warn('Page error: ' + err + elapsedTime(start, end));
+            grunt.log.warn('Page error: ' + err + ' (' + elapsed + 'ms)');
             issueCount++;
           } else if (!res.ok) {
-            grunt.log.warn('Bad page (' + res.status + '): ' + page + elapsedTime(start, end));
+            grunt.log.warn('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
             issueCount++;
           } else {
-            grunt.log.ok('Page: ' + page + elapsedTime(start, end));
+            grunt.log.ok('Page: ' + page + ' (' + elapsed + 'ms)');
             if (options.checkLinks) {
 
               // Check the page's links for validity (i.e., HTTP HEAD returns OK)
@@ -107,6 +102,14 @@ module.exports = function(grunt) {
               };
               parser.write(res.text);
             }
+            if (options.maxResponseTime) {
+
+              // Check the page's response time
+              if (options.maxResponseTime < elapsed) {
+                grunt.log.warn('Page response took more than ' + options.maxResponseTime + 'ms to complete');
+                issueCount++;
+              }
+            }
           }
           callback();
         });
@@ -121,19 +124,19 @@ module.exports = function(grunt) {
         [retryWithGet ? 'get' : 'head'](link)
         .use(setCommonHeaders)
         .end(function(err, res) {
-          var end = Date.now();
+          var elapsed = Date.now() - start;
           if (!err && !res.ok && !retryWithGet) {
             // Retry HEAD request as GET to be sure
             testLink(link, options, true)(callback);
           } else {
             if (err) {
-              grunt.log.warn('Link error: ' + err + elapsedTime(start, end));
+              grunt.log.warn('Link error: ' + err + ' (' + elapsed + 'ms)');
               issueCount++;
             } else if (!res.ok) {
-              grunt.log.warn('Bad link (' + res.status + '): ' + link + elapsedTime(start, end));
+              grunt.log.warn('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
               issueCount++;
             } else {
-              grunt.log.ok('Link: ' + link + elapsedTime(start, end));
+              grunt.log.ok('Link: ' + link + ' (' + elapsed + 'ms)');
             }
             callback();
           }
@@ -169,6 +172,9 @@ module.exports = function(grunt) {
       grunt.fail.warn('linksToIgnore option is invalid; it should be an array');
     }
     options.checkXhtml = !!options.checkXhtml;
+    if (options.maxResponseTime && (typeof(options.maxResponseTime) !== 'number' || (options.maxResponseTime <= 0))) {
+      grunt.fail.warn('maxResponseTime option is invalid; it should be a positive number');
+    }
 
     // Queue callbacks for each page
     options.pageUrls.forEach(function(page) {

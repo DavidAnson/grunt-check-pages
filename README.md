@@ -79,7 +79,7 @@ grunt.initConfig({
 #### pageUrls
 
 Type: `Array` of `String`  
-Default value: `null`  
+Default value: `undefined`  
 *Required*
 
 `pageUrls` specifies a list of URLs for web pages the task will check.
@@ -134,7 +134,7 @@ This can be useful to ensure outgoing links are to the content's canonical locat
 #### linksToIgnore
 
 Type: `Array` of `String`  
-Default value: `null`  
+Default value: `undefined`  
 Used by: `checkLinks`
 
 `linksToIgnore` specifies a list of URLs that should be ignored by the link checker.
@@ -150,10 +150,19 @@ Enabling `checkXhtml` attempts to parse each URL's content as [XHTML](http://en.
 
 This can be useful to ensure a page's structure is well-formed and unambiguous for browsers.
 
+#### maxResponseTime
+
+Type: `Number`  
+Default value: `undefined`
+
+`maxResponseTime` specifies the maximum amount of time (in milliseconds) a page request can take to finish downloading.
+
+Requests that take more time trigger a failure (but are still checked for any other issues).
+
 
 ## Release History
 
 * 0.1.0 - Initial release, support for `checkLinks` and `checkXhtml`.
 * 0.1.1 - Tweak README for better formatting.
 * 0.1.2 - Support page-only mode (no link or XHTML checks), show response time for requests.
-* *PENDING* - Add "no-cache" header to requests.
+* *PENDING* - Support `maxResponseTime` option, add "no-cache" header to requests.

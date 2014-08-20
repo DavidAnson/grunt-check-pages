@@ -30,11 +30,11 @@ function throws(test, block, message, assertions) {
 function testOutput(test, gruntMock, oks, warns) {
   test.equal(gruntMock.oks.length, oks.length);
   while(oks.length) {
-    test.equal(gruntMock.oks.shift().replace(/\d+ms/, '00ms'), oks.shift());
+    test.equal(gruntMock.oks.shift().replace(/\(\d+ms\)/, '(00ms)'), oks.shift());
   }
   test.equal(gruntMock.warns.length, warns.length);
   while(warns.length) {
-    test.equal(gruntMock.warns.shift().replace(/\d+ms/, '00ms'), warns.shift());
+    test.equal(gruntMock.warns.shift().replace(/\(\d+ms\)/, '(00ms)'), warns.shift());
   }
 }
 
@@ -103,6 +103,12 @@ exports.checkPages = {
     test.expect(4);
     var gruntMock = new GruntMock([], { pageUrls: [], linksToIgnore: 'string' });
     checkPagesThrows(test, gruntMock, [], ['linksToIgnore option is invalid; it should be an array']);
+  },
+
+  maxResponseTimeWrongType: function(test) {
+    test.expect(4);
+    var gruntMock = new GruntMock([], { pageUrls: [], maxResponseTime: 'string' });
+    checkPagesThrows(test, gruntMock, [], ['maxResponseTime option is invalid; it should be a positive number']);
   },
 
   /* Basic functionality */
@@ -433,5 +439,40 @@ exports.checkPages = {
       test.done();
     });
     checkPages(gruntMock);
+  },
+
+  /* maxResponseTime functionality */
+
+  maxResponseTimeValid: function(test) {
+    test.expect(3);
+    nock('http://example.com')
+      .get('/page')
+      .reply(200, '<html></html>', { 'Content-Type': 'text/html' });
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/page'],
+      maxResponseTime: 100
+    }, function() {
+      testOutput(test, gruntMock,
+        ['Page: http://example.com/page (00ms)'],
+        []);
+      test.done();
+    });
+    checkPages(gruntMock);
+  },
+
+  maxResponseTimeSlow: function(test) {
+    test.expect(6);
+    nock('http://example.com')
+      .get('/page')
+      .delay(200)
+      .reply(200, '<html></html>', { 'Content-Type': 'text/html' });
+    var gruntMock = new GruntMock([], {
+      pageUrls: ['http://example.com/page'],
+      maxResponseTime: 100
+    });
+    checkPagesThrows(test, gruntMock,
+      ['Page: http://example.com/page (00ms)'],
+      ['Page response took more than 100ms to complete',
+       '1 issue, see above']);
   },
 };
