@@ -1,7 +1,7 @@
 {
   "name": "grunt-check-pages",
   "description": "Checks various aspects of a web page for correctness.",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "homepage": "https://github.com/DavidAnson/grunt-check-pages",
   "author": {
     "name": "David Anson",

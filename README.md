@@ -55,7 +55,8 @@ grunt.initConfig({
         linksToIgnore: [
           'http://localhost:8080/broken.html'
         ],
-        checkXhtml: true
+        checkXhtml: true,
+        maxResponseTime: 200
       }
     },
     production: {
@@ -66,7 +67,8 @@ grunt.initConfig({
           'http://example.com/about.html'
         ],
         checkLinks: true,
-        checkXhtml: true
+        checkXhtml: true,
+        maxResponseTime: 500
       }
     }
   }
@@ -157,7 +159,7 @@ Default value: `undefined`
 
 `maxResponseTime` specifies the maximum amount of time (in milliseconds) a page request can take to finish downloading.
 
-Requests that take more time trigger a failure (but are still checked for any other issues).
+Requests that take more time will trigger a failure (but are still checked for other issues).
 
 
 ## Release History
@@ -165,4 +167,4 @@ Requests that take more time trigger a failure (but are still checked for any ot
 * 0.1.0 - Initial release, support for `checkLinks` and `checkXhtml`.
 * 0.1.1 - Tweak README for better formatting.
 * 0.1.2 - Support page-only mode (no link or XHTML checks), show response time for requests.
-* *PENDING* - Support `maxResponseTime` option, buffer all page responses, add "no-cache" header to requests.
+* 0.1.3 - Support `maxResponseTime` option, buffer all page responses, add "no-cache" header to requests.
