@@ -54,10 +54,7 @@ function nockFiles(files, base) {
   files.forEach(function(file) {
     scope
       .get('/' + file)
-      .replyWithFile(
-        200,
-        path.join(__dirname, file),
-        { 'Content-Type': 'text/html' });
+      .replyWithFile(200, path.join(__dirname, file));
   });
 }
 function nockLinks(links, base) {
@@ -243,7 +240,7 @@ exports.checkPages = {
     nockFiles(['retryWhenHeadFails.html']);
     nock('http://example.com')
       .head('/link').reply(500)
-      .get('/link').reply(200, '', { 'Content-Type': 'text/html' });
+      .get('/link').reply(200);
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/retryWhenHeadFails.html'],
       checkLinks: true
@@ -417,10 +414,7 @@ exports.checkPages = {
       .matchHeader('Cache-Control', 'no-cache')
       .matchHeader('Pragma', 'no-cache')
       .get('/page')
-      .reply(
-        200,
-        '<html><body><a href="link">link</a></body></html>',
-        { 'Content-Type': 'text/html' });
+      .reply(200, '<html><body><a href="link">link</a></body></html>');
     nock('http://example.com')
       .matchHeader('User-Agent', 'grunt-check-pages/0.1.2')
       .matchHeader('Cache-Control', 'no-cache')
@@ -447,7 +441,7 @@ exports.checkPages = {
     test.expect(3);
     nock('http://example.com')
       .get('/page')
-      .reply(200, '<html></html>', { 'Content-Type': 'text/html' });
+      .reply(200, '<html></html>');
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/page'],
       maxResponseTime: 100
@@ -465,7 +459,7 @@ exports.checkPages = {
     nock('http://example.com')
       .get('/page')
       .delay(200)
-      .reply(200, '<html></html>', { 'Content-Type': 'text/html' });
+      .reply(200, '<html></html>');
     var gruntMock = new GruntMock([], {
       pageUrls: ['http://example.com/page'],
       maxResponseTime: 100

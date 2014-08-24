@@ -64,6 +64,7 @@ module.exports = function(grunt) {
       request
         .get(page)
         .use(setCommonHeaders)
+        .buffer()
         .end(function(err, res) {
           var elapsed = Date.now() - start;
           if (err) {
@@ -123,6 +124,7 @@ module.exports = function(grunt) {
       var req = request
         [retryWithGet ? 'get' : 'head'](link)
         .use(setCommonHeaders)
+        .buffer()
         .end(function(err, res) {
           var elapsed = Date.now() - start;
           if (!err && !res.ok && !retryWithGet) {

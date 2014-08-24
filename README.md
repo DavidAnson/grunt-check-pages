@@ -165,4 +165,4 @@ Requests that take more time trigger a failure (but are still checked for any ot
 * 0.1.0 - Initial release, support for `checkLinks` and `checkXhtml`.
 * 0.1.1 - Tweak README for better formatting.
 * 0.1.2 - Support page-only mode (no link or XHTML checks), show response time for requests.
-* *PENDING* - Support `maxResponseTime` option, add "no-cache" header to requests.
+* *PENDING* - Support `maxResponseTime` option, buffer all responses, add "no-cache" header to requests.
