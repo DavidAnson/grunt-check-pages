@@ -68,10 +68,10 @@ module.exports = function(grunt) {
         .end(function(err, res) {
           var elapsed = Date.now() - start;
           if (err) {
-            grunt.log.warn('Page error: ' + err + ' (' + elapsed + 'ms)');
+            grunt.log.error('Page error: ' + err + ' (' + elapsed + 'ms)');
             issueCount++;
           } else if (!res.ok) {
-            grunt.log.warn('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
+            grunt.log.error('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
             issueCount++;
           } else {
             grunt.log.ok('Page: ' + page + ' (' + elapsed + 'ms)');
@@ -98,7 +98,7 @@ module.exports = function(grunt) {
               // Check the page's structure for XHTML compliance
               var parser = sax.parser(true);
               parser.onerror = function(error) {
-                grunt.log.warn(error.message.replace(/\n/g, ', '));
+                grunt.log.error(error.message.replace(/\n/g, ', '));
                 issueCount++;
               };
               parser.write(res.text);
@@ -107,7 +107,7 @@ module.exports = function(grunt) {
 
               // Check the page's response time
               if (options.maxResponseTime < elapsed) {
-                grunt.log.warn('Page response took more than ' + options.maxResponseTime + 'ms to complete');
+                grunt.log.error('Page response took more than ' + options.maxResponseTime + 'ms to complete');
                 issueCount++;
               }
             }
@@ -132,10 +132,10 @@ module.exports = function(grunt) {
             testLink(link, options, true)(callback);
           } else {
             if (err) {
-              grunt.log.warn('Link error: ' + err + ' (' + elapsed + 'ms)');
+              grunt.log.error('Link error: ' + err + ' (' + elapsed + 'ms)');
               issueCount++;
             } else if (!res.ok) {
-              grunt.log.warn('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
+              grunt.log.error('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
               issueCount++;
             } else {
               grunt.log.ok('Link: ' + link + ' (' + elapsed + 'ms)');
