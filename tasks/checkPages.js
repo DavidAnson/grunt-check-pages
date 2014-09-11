@@ -61,15 +61,16 @@ module.exports = function(grunt) {
   function testPage(page, options) {
     return function (callback) {
       var start = Date.now();
-      request
+      var req = request
         .get(page)
         .use(setCommonHeaders)
         .buffer(true)
         .end(function(err, res) {
           var elapsed = Date.now() - start;
           if (err) {
-            grunt.log.error('Page error: ' + err + ' (' + elapsed + 'ms)');
+            grunt.log.error('Page error (' + err.message + '): ' + page + ' (' + elapsed + 'ms)');
             issueCount++;
+            req.abort();
           } else if (!res.ok) {
             grunt.log.error('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
             issueCount++;
@@ -132,8 +133,9 @@ module.exports = function(grunt) {
             testLink(link, options, true)(callback);
           } else {
             if (err) {
-              grunt.log.error('Link error: ' + err + ' (' + elapsed + 'ms)');
+              grunt.log.error('Link error (' + err.message + '): ' + link + ' (' + elapsed + 'ms)');
               issueCount++;
+              req.abort();
             } else if (!res.ok) {
               grunt.log.error('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
               issueCount++;

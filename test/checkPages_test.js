@@ -6,8 +6,10 @@ var nock = require('nock');
 var gruntMock = require('gruntmock');
 var checkPages = require('../tasks/checkPages.js');
 
-// Block all unexpected network calls
+// Block all unexpected network calls...
 nock.disableNetConnect();
+// ... except deliberate connection errors
+nock.enableNetConnect('localhost');
 
 // Verify a task's output
 function testOutput(test, ok, error) {
@@ -429,6 +431,33 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/page (00ms)'],
       ['Page response took more than 100ms to complete',
+       '1 issue, see above']));
+  },
+
+  // Connection errors
+
+  pageConnectionError: function(test) {
+    test.expect(5);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://localhost:9999/notListening']}});
+    mock.invoke(checkPages, testOutput(test,
+      [],
+      ['Page error (connect ECONNREFUSED): http://localhost:9999/notListening (00ms)',
+       '1 issue, see above']));
+  },
+
+  linkConnectionError: function(test) {
+    test.expect(6);
+    nock('http://example.com')
+      .get('/page')
+      .reply(200, '<html><body><a href="http://localhost:9999/notListening">notListening</a></body></html>');
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/page'],
+      checkLinks: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/page (00ms)'],
+      ['Link error (connect ECONNREFUSED): http://localhost:9999/notListening (00ms)',
        '1 issue, see above']));
   },
 };
