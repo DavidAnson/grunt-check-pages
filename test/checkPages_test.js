@@ -14,16 +14,16 @@ nock.enableNetConnect('localhost');
 // Verify a task's output
 function testOutput(test, ok, error) {
   return function(err, mock) {
-    test.equal(mock.logOk.length, ok.length);
-    test.equal(mock.logError.length, error.length);
+    test.equal(mock.logOk.length, ok.length, 'Wrong logOk count');
+    test.equal(mock.logError.length, error.length, 'Wrong logError count');
     if (err) {
-      test.equal(err.message, error.slice(-1));
+      test.equal(err.message, error.slice(-1), 'Wrong exception text');
     }
-    while (ok.length) {
-      test.equal(mock.logOk.shift().replace(/\(\d+ms\)/, '(00ms)'), ok.shift());
+    while (mock.logOk.length && ok.length) {
+      test.equal(mock.logOk.shift().replace(/\(\d+ms\)/, '(00ms)'), ok.shift(), 'Wrong logOk item');
     }
-    while (error.length) {
-      test.equal(mock.logError.shift().replace(/\(\d+ms\)/, '(00ms)'), error.shift());
+    while (mock.logError.length && error.length) {
+      test.equal(mock.logError.shift().replace(/\(\d+ms\)/, '(00ms)'), error.shift(), 'Wrong logError item');
     }
     test.done();
   };
@@ -31,12 +31,12 @@ function testOutput(test, ok, error) {
 
 /* Helpers for mocking HTTP requests */
 
-function nockFiles(files, base) {
+function nockFiles(files, base, headers) {
   var scope = nock(base || 'http://example.com');
   files.forEach(function(file) {
     scope
       .get('/' + file)
-      .replyWithFile(200, path.join(__dirname, file));
+      .replyWithFile(200, path.join(__dirname, file), headers);
   });
 }
 function nockLinks(links, base) {
@@ -373,6 +373,85 @@ exports.checkPages = {
       ['Invalid character entity, Line: 4, Column: 23, Char: ;',
        'Unexpected close tag, Line: 5, Column: 6, Char: >',
        '2 issues, see above']));
+  },
+
+  // checkCaching functionality
+
+  checkCachingValid: function(test) {
+    test.expect(3);
+    nockFiles(['validPage.html'], null, {
+      'Cache-Control': 'public, max-age=1000',
+      'ETag': '"123abc"'
+    });
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkCaching: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/validPage.html (00ms)'],
+      []));
+  },
+
+  checkCachingMissingCacheControl: function(test) {
+    test.expect(6);
+    nockFiles(['validPage.html'], null, {
+      'ETag': '"123abc"'
+    });
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkCaching: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/validPage.html (00ms)'],
+      ['Missing Cache-Control header in response',
+       '1 issue, see above']));
+  },
+
+  checkCachingInvalidCacheControl: function(test) {
+    test.expect(6);
+    nockFiles(['validPage.html'], null, {
+      'Cache-Control': 'invalid',
+      'ETag': '"123abc"'
+    });
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkCaching: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/validPage.html (00ms)'],
+      ['Invalid Cache-Control header in response: invalid',
+       '1 issue, see above']));
+  },
+
+  checkCachingMissingEtag: function(test) {
+    test.expect(6);
+    nockFiles(['validPage.html'], null, {
+      'Cache-Control': 'public, max-age=1000'
+    });
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkCaching: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/validPage.html (00ms)'],
+      ['Missing ETag header in response',
+       '1 issue, see above']));
+  },
+
+  checkCachingInvalidEtag: function(test) {
+    test.expect(6);
+    nockFiles(['validPage.html'], null, {
+      'Cache-Control': 'public, max-age=1000',
+      'ETag': 'invalid'
+    });
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkCaching: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/validPage.html (00ms)'],
+      ['Invalid ETag header in response: invalid',
+       '1 issue, see above']));
   },
 
   // Nock configuration

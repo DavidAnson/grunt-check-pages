@@ -56,6 +56,7 @@ grunt.initConfig({
           'http://localhost:8080/broken.html'
         ],
         checkXhtml: true,
+        checkCaching: true,
         maxResponseTime: 200
       }
     },
@@ -68,6 +69,7 @@ grunt.initConfig({
         ],
         checkLinks: true,
         checkXhtml: true,
+        checkCaching: true,
         maxResponseTime: 500
       }
     }
@@ -152,6 +154,15 @@ Enabling `checkXhtml` attempts to parse each URL's content as [XHTML](http://en.
 
 This can be useful to ensure a page's structure is well-formed and unambiguous for browsers.
 
+#### checkCaching
+
+Type: `Boolean`  
+Default value: `false`
+
+Enabling `checkCaching` verifies the HTTP [`Cache-Control`](https://tools.ietf.org/html/rfc2616#section-14.9) and [`ETag`](https://tools.ietf.org/html/rfc2616#section-14.19) headers are present and valid.
+
+This is useful to ensure a page makes use of [browser caching for better performance](https://developers.google.com/speed/docs/insights/LeverageBrowserCaching).
+
 #### maxResponseTime
 
 Type: `Number`  
@@ -168,3 +179,4 @@ Requests that take more time will trigger a failure (but are still checked for o
 * 0.1.1 - Tweak README for better formatting.
 * 0.1.2 - Support page-only mode (no link or XHTML checks), show response time for requests.
 * 0.1.3 - Support `maxResponseTime` option, buffer all page responses, add "no-cache" header to requests.
+* 0.1.4 - PENDING

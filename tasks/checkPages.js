@@ -26,6 +26,12 @@ module.exports = function(grunt) {
   var pendingCallbacks = [];
   var issueCount = 0;
 
+  // Logs an error and increments the error count
+  function logError(message) {
+    grunt.log.error(message);
+    issueCount++;
+  }
+
   // Set common request headers
   function setCommonHeaders(req) {
     req
@@ -68,12 +74,10 @@ module.exports = function(grunt) {
         .end(function(err, res) {
           var elapsed = Date.now() - start;
           if (err) {
-            grunt.log.error('Page error (' + err.message + '): ' + page + ' (' + elapsed + 'ms)');
-            issueCount++;
+            logError('Page error (' + err.message + '): ' + page + ' (' + elapsed + 'ms)');
             req.abort();
           } else if (!res.ok) {
-            grunt.log.error('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
-            issueCount++;
+            logError('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
           } else {
             grunt.log.ok('Page: ' + page + ' (' + elapsed + 'ms)');
             if (options.checkLinks) {
@@ -99,8 +103,7 @@ module.exports = function(grunt) {
               // Check the page's structure for XHTML compliance
               var parser = sax.parser(true);
               parser.onerror = function(error) {
-                grunt.log.error(error.message.replace(/\n/g, ', '));
-                issueCount++;
+                logError(error.message.replace(/\n/g, ', '));
               };
               parser.write(res.text);
             }
@@ -108,8 +111,27 @@ module.exports = function(grunt) {
 
               // Check the page's response time
               if (options.maxResponseTime < elapsed) {
-                grunt.log.error('Page response took more than ' + options.maxResponseTime + 'ms to complete');
-                issueCount++;
+                logError('Page response took more than ' + options.maxResponseTime + 'ms to complete');
+              }
+            }
+            if (options.checkCaching) {
+
+              // Check the page's cache headers
+              var cacheControl = res.headers['cache-control'];
+              if (cacheControl) {
+                if (!/(max-age)|(max-stale)|(min-fresh)|(must-revalidate)|(no-cache)|(no-store)|(no-transform)|(only-if-cached)|(private)|(proxy-revalidate)|(public)|(s-maxage)/.test(cacheControl)) {
+                  logError('Invalid Cache-Control header in response: ' + cacheControl);
+                }
+              } else {
+                logError('Missing Cache-Control header in response');
+              }
+              var etag = res.headers.etag;
+              if (etag) {
+                if (!/^\"[^\"]*\"$/.test(etag)) {
+                  logError('Invalid ETag header in response: ' + etag);
+                }
+              } else {
+                logError('Missing ETag header in response');
               }
             }
           }
@@ -133,12 +155,10 @@ module.exports = function(grunt) {
             testLink(link, options, true)(callback);
           } else {
             if (err) {
-              grunt.log.error('Link error (' + err.message + '): ' + link + ' (' + elapsed + 'ms)');
-              issueCount++;
+              logError('Link error (' + err.message + '): ' + link + ' (' + elapsed + 'ms)');
               req.abort();
             } else if (!res.ok) {
-              grunt.log.error('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
-              issueCount++;
+              logError('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
             } else {
               grunt.log.ok('Link: ' + link + ' (' + elapsed + 'ms)');
             }
@@ -176,6 +196,7 @@ module.exports = function(grunt) {
       grunt.fail.warn('linksToIgnore option is invalid; it should be an array');
     }
     options.checkXhtml = !!options.checkXhtml;
+    options.checkCaching = !!options.checkCaching;
     if (options.maxResponseTime && (typeof(options.maxResponseTime) !== 'number' || (options.maxResponseTime <= 0))) {
       grunt.fail.warn('maxResponseTime option is invalid; it should be a positive number');
     }
