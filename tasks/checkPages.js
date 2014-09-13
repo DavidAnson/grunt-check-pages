@@ -119,7 +119,7 @@ module.exports = function(grunt) {
               // Check the page's cache headers
               var cacheControl = res.headers['cache-control'];
               if (cacheControl) {
-                if (!/(max-age)|(max-stale)|(min-fresh)|(must-revalidate)|(no-cache)|(no-store)|(no-transform)|(only-if-cached)|(private)|(proxy-revalidate)|(public)|(s-maxage)/.test(cacheControl)) {
+                if (!/max-age|max-stale|min-fresh|must-revalidate|no-cache|no-store|no-transform|only-if-cached|private|proxy-revalidate|public|s-maxage/.test(cacheControl)) {
                   logError('Invalid Cache-Control header in response: ' + cacheControl);
                 }
               } else {
@@ -132,6 +132,18 @@ module.exports = function(grunt) {
                 }
               } else {
                 logError('Missing ETag header in response');
+              }
+            }
+            if (options.checkCompression) {
+
+              // Check that the page was compressed (superagent always sets Accept-Encoding to gzip/deflate)
+              var contentEncoding = res.headers['content-encoding'];
+              if (contentEncoding) {
+                if (!/^(deflate|gzip)$/.test(contentEncoding)) {
+                  logError('Invalid Content-Encoding header in response: ' + contentEncoding);
+                }
+              } else {
+                logError('Missing Content-Encoding header in response');
               }
             }
           }
@@ -197,6 +209,7 @@ module.exports = function(grunt) {
     }
     options.checkXhtml = !!options.checkXhtml;
     options.checkCaching = !!options.checkCaching;
+    options.checkCompression = !!options.checkCompression;
     if (options.maxResponseTime && (typeof(options.maxResponseTime) !== 'number' || (options.maxResponseTime <= 0))) {
       grunt.fail.warn('maxResponseTime option is invalid; it should be a positive number');
     }

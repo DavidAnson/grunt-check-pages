@@ -2,6 +2,7 @@
 
 // Requires
 var path = require('path');
+var zlib = require('zlib');
 var nock = require('nock');
 var gruntMock = require('gruntmock');
 var checkPages = require('../tasks/checkPages.js');
@@ -451,6 +452,57 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/validPage.html (00ms)'],
       ['Invalid ETag header in response: invalid',
+       '1 issue, see above']));
+  },
+
+  // checkCompression functionality
+
+  checkCompressionValid: function(test) {
+    test.expect(4);
+    zlib.gzip('<html><body><a href="link">link</a></body></html>', function(err, buf) {
+      nock('http://example.com')
+        .get('/compressed')
+        .reply(200, [buf], {
+          'Content-Encoding': 'gzip'
+        });
+      nockLinks(['link']);
+      var mock = gruntMock.create({ options: {
+        pageUrls: ['http://example.com/compressed'],
+        checkCompression: true,
+        checkLinks: true
+      }});
+      mock.invoke(checkPages, testOutput(test,
+        ['Page: http://example.com/compressed (00ms)',
+         'Link: http://example.com/link (00ms)'],
+        []));
+    });
+  },
+
+  checkCompressionMissingContentEncoding: function(test) {
+    test.expect(6);
+    nockFiles(['validPage.html']);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkCompression: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/validPage.html (00ms)'],
+      ['Missing Content-Encoding header in response',
+       '1 issue, see above']));
+  },
+
+  checkCompressionInvalidContentEncoding: function(test) {
+    test.expect(6);
+    nockFiles(['validPage.html'], null, {
+      'Content-Encoding': 'invalid'
+    });
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkCompression: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/validPage.html (00ms)'],
+      ['Invalid Content-Encoding header in response: invalid',
        '1 issue, see above']));
   },
 

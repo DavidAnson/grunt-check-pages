@@ -57,6 +57,7 @@ grunt.initConfig({
         ],
         checkXhtml: true,
         checkCaching: true,
+        checkCompression: true,
         maxResponseTime: 200
       }
     },
@@ -68,8 +69,6 @@ grunt.initConfig({
           'http://example.com/about.html'
         ],
         checkLinks: true,
-        checkXhtml: true,
-        checkCaching: true,
         maxResponseTime: 500
       }
     }
@@ -162,6 +161,15 @@ Default value: `false`
 Enabling `checkCaching` verifies the HTTP [`Cache-Control`](https://tools.ietf.org/html/rfc2616#section-14.9) and [`ETag`](https://tools.ietf.org/html/rfc2616#section-14.19) headers are present and valid.
 
 This is useful to ensure a page makes use of [browser caching for better performance](https://developers.google.com/speed/docs/insights/LeverageBrowserCaching).
+
+#### checkCompression
+
+Type: `Boolean`  
+Default value: `false`
+
+Enabling `checkCompression` verifies the HTTP [`Content-Encoding`](https://tools.ietf.org/html/rfc2616#section-14.11) header is present and valid.
+
+This is useful to ensure a page makes use of [compression for better performance](https://developers.google.com/speed/docs/insights/EnableCompression).
 
 #### maxResponseTime
 
