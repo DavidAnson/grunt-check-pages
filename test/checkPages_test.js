@@ -393,6 +393,20 @@ exports.checkPages = {
       []));
   },
 
+  checkCachingNoCache: function(test) {
+    test.expect(3);
+    nockFiles(['validPage.html'], null, {
+      'Cache-Control': 'no-cache'
+    });
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/validPage.html'],
+      checkCaching: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/validPage.html (00ms)'],
+      []));
+  },
+
   checkCachingMissingCacheControl: function(test) {
     test.expect(6);
     nockFiles(['validPage.html'], null, {

@@ -37,7 +37,7 @@ module.exports = function(grunt) {
     req
       .set('User-Agent', userAgent)
       .set('Cache-Control', 'no-cache')
-      .set('Pragma', 'no-cache');
+      .set('Pragma', 'no-cache'); // Prevent caching so response time will be accurate
   }
 
   // Returns true if and only if the specified link is on the list to ignore
@@ -130,7 +130,7 @@ module.exports = function(grunt) {
                 if (!/^\"[^\"]*\"$/.test(etag)) {
                   logError('Invalid ETag header in response: ' + etag);
                 }
-              } else {
+              } else if (!cacheControl || !/no-cache|max-age=0/.test(cacheControl)) { // Don't require ETag for responses that won't be cached
                 logError('Missing ETag header in response');
               }
             }
