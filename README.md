@@ -25,13 +25,16 @@ grunt.loadNpmTasks('grunt-check-pages');
 
 ### Overview
 
-An important aspect of creating a web site is to validate the structure and content of the site's pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
+An important aspect of creating a web site is to validate the structure, content, and configuration of the site's pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
 
 By providing a list of pages to scan, the task can:
 
 * Validate each page is accessible
 * Validate all links point to accessible content (similar to the [W3C Link Checker](http://validator.w3.org/checklink))
 * Validate page structure for XHTML compliance (akin to the [W3C Markup Validation Service](http://validator.w3.org/))
+* Validate a page's response time is below some threshold
+* Validate a page takes advantage of [caching for better performance](https://developers.google.com/speed/docs/insights/LeverageBrowserCaching)
+* Validate a page takes advantage of [compression for better performance](https://developers.google.com/speed/docs/insights/EnableCompression)
 
 
 ### Usage
@@ -158,18 +161,18 @@ This can be useful to ensure a page's structure is well-formed and unambiguous f
 Type: `Boolean`  
 Default value: `false`
 
-Enabling `checkCaching` verifies the HTTP [`Cache-Control`](https://tools.ietf.org/html/rfc2616#section-14.9) and [`ETag`](https://tools.ietf.org/html/rfc2616#section-14.19) headers are present and valid.
+Enabling `checkCaching` verifies the HTTP [`Cache-Control`](https://tools.ietf.org/html/rfc2616#section-14.9) and [`ETag`](https://tools.ietf.org/html/rfc2616#section-14.19) response headers are present and valid.
 
-This is useful to ensure a page makes use of [browser caching for better performance](https://developers.google.com/speed/docs/insights/LeverageBrowserCaching).
+This is useful to ensure a page makes use of browser caching for better performance.
 
 #### checkCompression
 
 Type: `Boolean`  
 Default value: `false`
 
-Enabling `checkCompression` verifies the HTTP [`Content-Encoding`](https://tools.ietf.org/html/rfc2616#section-14.11) header is present and valid.
+Enabling `checkCompression` verifies the HTTP [`Content-Encoding`](https://tools.ietf.org/html/rfc2616#section-14.11) response header is present and valid.
 
-This is useful to ensure a page makes use of [compression for better performance](https://developers.google.com/speed/docs/insights/EnableCompression).
+This is useful to ensure a page makes use of compression for better performance.
 
 #### maxResponseTime
 
@@ -187,4 +190,4 @@ Requests that take more time will trigger a failure (but are still checked for o
 * 0.1.1 - Tweak README for better formatting.
 * 0.1.2 - Support page-only mode (no link or XHTML checks), show response time for requests.
 * 0.1.3 - Support `maxResponseTime` option, buffer all page responses, add "no-cache" header to requests.
-* 0.1.4 - PENDING
+* 0.1.4 - Support `checkCaching` and `checkCompression` options, improve error handling, use [`gruntMock`](https://www.npmjs.org/package/gruntmock).
