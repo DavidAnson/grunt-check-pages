@@ -127,7 +127,7 @@ module.exports = function(grunt) {
               }
               var etag = res.headers.etag;
               if (etag) {
-                if (!/^\"[^\"]*\"$/.test(etag)) {
+                if (!/^(W\/)?\"[^\"]*\"$/.test(etag)) {
                   logError('Invalid ETag header in response: ' + etag);
                 }
               } else if (!cacheControl || !/no-cache|max-age=0/.test(cacheControl)) { // Don't require ETag for responses that won't be cached
