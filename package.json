@@ -37,7 +37,7 @@
     "grunt-contrib-nodeunit": "^0.4.1",
     "grunt-contrib-watch": "^0.6.1",
     "gruntmock": "^0.1.1",
-    "nock": "^0.45.0"
+    "nock": "^0.47.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.4"
