@@ -201,3 +201,4 @@ This is useful for pages that alter their behavior based on the user agent. Sett
 * 0.1.2 - Support page-only mode (no link or XHTML checks), show response time for requests.
 * 0.1.3 - Support `maxResponseTime` option, buffer all page responses, add "no-cache" header to requests.
 * 0.1.4 - Support `checkCaching` and `checkCompression` options, improve error handling, use [`gruntMock`](https://www.npmjs.org/package/gruntmock).
+* 0.1.5 - Support `userAgent` option, weak entity tags, update `nock` dependency.
