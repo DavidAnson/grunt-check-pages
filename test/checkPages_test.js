@@ -550,33 +550,6 @@ exports.checkPages = {
        '1 issue, see above']));
   },
 
-  // Nock configuration
-
-  requestHeaders: function(test) {
-    test.expect(4);
-    nock('http://example.com')
-      .matchHeader('User-Agent', 'grunt-check-pages/0.1.4')
-      .matchHeader('Cache-Control', 'no-cache')
-      .matchHeader('Pragma', 'no-cache')
-      .get('/page')
-      .reply(200, '<html><body><a href="link">link</a></body></html>');
-    nock('http://example.com')
-      .matchHeader('User-Agent', 'grunt-check-pages/0.1.4')
-      .matchHeader('Cache-Control', 'no-cache')
-      .matchHeader('Pragma', 'no-cache')
-      .head('/link')
-      .reply(200);
-    var mock = gruntMock.create({ options: {
-      pageUrls: ['http://example.com/page'],
-      checkLinks: true,
-      checkXhtml: true
-    }});
-    mock.invoke(checkPages, testOutput(test,
-      ['Page: http://example.com/page (00ms)',
-       'Link: http://example.com/link (00ms)'],
-      []));
-  },
-
   // maxResponseTime functionality
 
   maxResponseTimeValid: function(test) {
@@ -607,6 +580,33 @@ exports.checkPages = {
       ['Page: http://example.com/page (00ms)'],
       ['Page response took more than 100ms to complete',
        '1 issue, see above']));
+  },
+
+  // Nock configuration
+
+  requestHeaders: function(test) {
+    test.expect(4);
+    nock('http://example.com')
+      .matchHeader('User-Agent', 'grunt-check-pages/0.1.4')
+      .matchHeader('Cache-Control', 'no-cache')
+      .matchHeader('Pragma', 'no-cache')
+      .get('/page')
+      .reply(200, '<html><body><a href="link">link</a></body></html>');
+    nock('http://example.com')
+      .matchHeader('User-Agent', 'grunt-check-pages/0.1.4')
+      .matchHeader('Cache-Control', 'no-cache')
+      .matchHeader('Pragma', 'no-cache')
+      .head('/link')
+      .reply(200);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/page'],
+      checkLinks: true,
+      checkXhtml: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/page (00ms)',
+       'Link: http://example.com/link (00ms)'],
+      []));
   },
 
   // Connection errors
