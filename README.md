@@ -61,7 +61,8 @@ grunt.initConfig({
         checkXhtml: true,
         checkCaching: true,
         checkCompression: true,
-        maxResponseTime: 200
+        maxResponseTime: 200,
+        userAgent: 'custom-user-agent/1.2.3'
       }
     },
     production: {
@@ -182,6 +183,15 @@ Default value: `undefined`
 `maxResponseTime` specifies the maximum amount of time (in milliseconds) a page request can take to finish downloading.
 
 Requests that take more time will trigger a failure (but are still checked for other issues).
+
+#### userAgent
+
+Type: `String`  
+Default value: `grunt-check-pages/x.y.z`
+
+`userAgent` specifies the value of the HTTP [`User-Agent`](https://tools.ietf.org/html/rfc2616#section-14.43) header sent with all page/link requests.
+
+This is useful for pages that alter their behavior based on the user agent. Setting the value `null` omits the `User-Agent` header entirely.
 
 
 ## Release History

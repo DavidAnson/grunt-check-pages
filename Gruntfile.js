@@ -41,11 +41,11 @@ module.exports = function(grunt) {
       popular: {
         options: {
           pageUrls: [
-            'http://microsoft.com/',  // Doesn't set ETag
+            'http://microsoft.com/',  // Doesn't set ETag for custom user-agent; doesn't set Content-Encoding for Chrome
             'http://bing.com/',       // Doesn't set Content-Encoding
-            'http://google.com/',     // Doesn't set Content-Encoding (for custom User-Agent)
+            'http://google.com/',     // Doesn't set Content-Encoding for custom User-Agent (set for Chrome header)
             'http://facebook.com/',
-            'http://youtube.com',     // Doesn't set Content-Encoding (for custom User-Agent)
+            'http://youtube.com',     // Doesn't set Content-Encoding for custom User-Agent (set for Chrome header)
             'http://wikipedia.org/',
             'http://twitter.com/',
             'http://amazon.com/',
@@ -55,7 +55,8 @@ module.exports = function(grunt) {
             'https://github.com/'
           ],
           checkCaching: true,
-          checkCompression: true
+          checkCompression: true,
+          userAgent: 'Mozilla/5.0 (Windows NT 6.3; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/37.0.2062.120 Safari/537.36'
         }
       }
     }

@@ -34,10 +34,16 @@ module.exports = function(grunt) {
 
   // Set common request headers
   function setCommonHeaders(req) {
+    // Set (or clear) user agent
+    if (userAgent) {
+      req.set('User-Agent', userAgent);
+    } else {
+      req.unset('User-Agent');
+    }
+    // Prevent caching so response time will be accurate
     req
-      .set('User-Agent', userAgent)
       .set('Cache-Control', 'no-cache')
-      .set('Pragma', 'no-cache'); // Prevent caching so response time will be accurate
+      .set('Pragma', 'no-cache');
   }
 
   // Returns true if and only if the specified link is on the list to ignore
@@ -212,6 +218,17 @@ module.exports = function(grunt) {
     options.checkCompression = !!options.checkCompression;
     if (options.maxResponseTime && (typeof(options.maxResponseTime) !== 'number' || (options.maxResponseTime <= 0))) {
       grunt.fail.warn('maxResponseTime option is invalid; it should be a positive number');
+    }
+    if (options.userAgent !== undefined) {
+      if (options.userAgent) {
+        if (typeof(options.userAgent) === 'string') {
+          userAgent = options.userAgent;
+        } else {
+          grunt.fail.warn('userAgent option is invalid; it should be a string or null');
+        }
+      } else {
+        userAgent = null;
+      }
     }
 
     // Queue callbacks for each page

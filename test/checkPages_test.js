@@ -101,6 +101,14 @@ exports.checkPages = {
       ['maxResponseTime option is invalid; it should be a positive number']));
   },
 
+  userAgentWrongType: function(test) {
+    test.expect(4);
+    var mock = gruntMock.create({ options: { pageUrls: [], userAgent: 5 } });
+    mock.invoke(checkPages, testOutput(test,
+      [],
+      ['userAgent option is invalid; it should be a string or null']));
+  },
+
   // Basic functionality
 
   pageUrlsEmpty: function(test) {
@@ -582,6 +590,65 @@ exports.checkPages = {
        '1 issue, see above']));
   },
 
+  // userAgent functionality
+
+  userAgentValid: function(test) {
+    test.expect(4);
+    nock('http://example.com')
+      .matchHeader('User-Agent', 'custom-user-agent/1.2.3')
+      .get('/page')
+      .reply(200, '<html><body><a href="link">link</a></body></html>');
+    nock('http://example.com')
+      .matchHeader('User-Agent', 'custom-user-agent/1.2.3')
+      .head('/link')
+      .reply(200);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/page'],
+      checkLinks: true,
+      userAgent: 'custom-user-agent/1.2.3'
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/page (00ms)',
+       'Link: http://example.com/link (00ms)'],
+      []));
+  },
+
+  userAgentNull: function(test) {
+    test.expect(4);
+    nock('http://example.com')
+      .matchHeader('User-Agent', function(val) {
+        test.ok(undefined === val);
+        return true;
+      })
+      .get('/page')
+      .reply(200);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/page'],
+      userAgent: null
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/page (00ms)'],
+      []));
+  },
+
+  userAgentEmpty: function(test) {
+    test.expect(4);
+    nock('http://example.com')
+      .matchHeader('User-Agent', function(val) {
+        test.ok(undefined === val);
+        return true;
+      })
+      .get('/page')
+      .reply(200);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/page'],
+      userAgent: ''
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/page (00ms)'],
+      []));
+  },
+
   // Nock configuration
 
   requestHeaders: function(test) {
@@ -600,8 +667,7 @@ exports.checkPages = {
       .reply(200);
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/page'],
-      checkLinks: true,
-      checkXhtml: true
+      checkLinks: true
     }});
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/page (00ms)',
