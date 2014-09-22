@@ -512,21 +512,23 @@ exports.checkPages = {
   checkCompressionValid: function(test) {
     test.expect(4);
     zlib.gzip('<html><body><a href="link">link</a></body></html>', function(err, buf) {
-      nock('http://example.com')
-        .get('/compressed')
-        .reply(200, [buf], {
-          'Content-Encoding': 'gzip'
-        });
-      nockLinks(['link']);
-      var mock = gruntMock.create({ options: {
-        pageUrls: ['http://example.com/compressed'],
-        checkCompression: true,
-        checkLinks: true
-      }});
-      mock.invoke(checkPages, testOutput(test,
-        ['Page: http://example.com/compressed (00ms)',
-         'Link: http://example.com/link (00ms)'],
-        []));
+      if (!err) {
+        nock('http://example.com')
+          .get('/compressed')
+          .reply(200, [buf], {
+            'Content-Encoding': 'gzip'
+          });
+        nockLinks(['link']);
+        var mock = gruntMock.create({ options: {
+          pageUrls: ['http://example.com/compressed'],
+          checkCompression: true,
+          checkLinks: true
+        }});
+        mock.invoke(checkPages, testOutput(test,
+          ['Page: http://example.com/compressed (00ms)',
+           'Link: http://example.com/link (00ms)'],
+          []));
+      }
     });
   },
 
@@ -700,5 +702,5 @@ exports.checkPages = {
       ['Page: http://example.com/page (00ms)'],
       ['Link error (connect ECONNREFUSED): http://localhost:9999/notListening (00ms)',
        '1 issue, see above']));
-  },
+  }
 };

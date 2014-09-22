@@ -24,6 +24,13 @@ module.exports = function(grunt) {
         jshintrc: '.jshintrc'
       }
     },
+    eslint: {
+      target: [
+        'Gruntfile.js',
+        'tasks/*.js',
+        'test/*.js'
+      ]
+    },
 
     // Unit tests
     nodeunit: {
@@ -66,6 +73,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-eslint');
 
   // Load checkPages plugin for self-testing
   grunt.loadTasks('./tasks');
@@ -90,5 +98,5 @@ module.exports = function(grunt) {
   });
 
   // Default: Test and lint
-  grunt.registerTask('default', ['nodeunit', 'jshint']);
+  grunt.registerTask('default', ['nodeunit', 'jshint', 'eslint']);
 };
