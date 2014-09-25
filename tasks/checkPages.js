@@ -60,7 +60,7 @@ module.exports = function(grunt) {
       var link = $(this).attr(attribute);
       if (link) {
         var resolvedLink = url.resolve(base, link);
-        if((!options.onlySameDomainLinks || (url.parse(resolvedLink).hostname === baseHostname)) &&
+        if ((!options.onlySameDomainLinks || (url.parse(resolvedLink).hostname === baseHostname)) &&
            !isLinkIgnored(resolvedLink, options)) {
           // Add to front of queue so it gets processed before the next page
           pendingCallbacks.unshift(testLink(resolvedLink, options));
@@ -216,12 +216,12 @@ module.exports = function(grunt) {
     options.checkXhtml = !!options.checkXhtml;
     options.checkCaching = !!options.checkCaching;
     options.checkCompression = !!options.checkCompression;
-    if (options.maxResponseTime && (typeof(options.maxResponseTime) !== 'number' || (options.maxResponseTime <= 0))) {
+    if (options.maxResponseTime && (typeof (options.maxResponseTime) !== 'number' || (options.maxResponseTime <= 0))) {
       grunt.fail.warn('maxResponseTime option is invalid; it should be a positive number');
     }
     if (options.userAgent !== undefined) {
       if (options.userAgent) {
-        if (typeof(options.userAgent) === 'string') {
+        if (typeof (options.userAgent) === 'string') {
           userAgent = options.userAgent;
         } else {
           grunt.fail.warn('userAgent option is invalid; it should be a string or null');
@@ -240,16 +240,16 @@ module.exports = function(grunt) {
     var done = this.async();
     pendingCallbacks.push(function() {
       if (issueCount) {
-        grunt.fail.warn(issueCount + ' issue' + (1 < issueCount ? 's' : '') + ', see above');
+        grunt.fail.warn(issueCount + ' issue' + (issueCount > 1 ? 's' : '') + ', see above');
       }
       done();
     });
 
     // Process the queue
-    var next = function() {
+    function next() {
       var callback = pendingCallbacks.shift();
       callback(next);
-    };
+    }
     next();
   });
 };
