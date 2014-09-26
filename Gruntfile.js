@@ -14,18 +14,8 @@ module.exports = function(grunt) {
   grunt.initConfig({
 
     // Linting
-    jshint: {
-      files: [
-        'Gruntfile.js',
-        'tasks/*.js',
-        'test/*.js'
-      ],
-      options: {
-        jshintrc: '.jshintrc'
-      }
-    },
     eslint: {
-      target: [
+      files: [
         'Gruntfile.js',
         'tasks/*.js',
         'test/*.js'
@@ -70,7 +60,6 @@ module.exports = function(grunt) {
   });
 
   // Load required plugins
-  grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-nodeunit');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-eslint');
@@ -98,5 +87,5 @@ module.exports = function(grunt) {
   });
 
   // Default: Test and lint
-  grunt.registerTask('default', ['nodeunit', 'jshint', 'eslint']);
+  grunt.registerTask('default', ['nodeunit', 'eslint']);
 };
