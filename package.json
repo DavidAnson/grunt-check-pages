@@ -29,7 +29,7 @@
   "dependencies": {
     "cheerio": "^0.17.0",
     "sax": "^0.6.0",
-    "superagent": "^0.18.2"
+    "superagent": "^0.19.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
@@ -37,7 +37,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-eslint": "^1.1.0",
     "gruntmock": "^0.1.1",
-    "nock": "^0.47.0"
+    "nock": "^0.48.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.4"

@@ -15,12 +15,6 @@ module.exports = function(grunt) {
   var cheerio = require('cheerio');
   var sax = require('sax');
 
-  // Patch the Node.js version of superagent's Request which is missing 'use'
-  request.Request.prototype.use = function(fn) {
-    fn(this);
-    return this;
-  };
-
   // Global variables
   var userAgent = 'grunt-check-pages/' + require('../package.json').version;
   var pendingCallbacks = [];
