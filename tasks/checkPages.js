@@ -177,7 +177,7 @@ module.exports = function(grunt) {
             callback();
           }
         });
-      if (options.disallowRedirect) {
+      if (options.noRedirects) {
         req.redirects(0);
       }
       if (options.noLocalLinks) {
@@ -208,7 +208,7 @@ module.exports = function(grunt) {
     // Check for and normalize optional options
     options.checkLinks = !!options.checkLinks;
     options.onlySameDomainLinks = !!options.onlySameDomainLinks;
-    options.disallowRedirect = !!options.disallowRedirect;
+    options.noRedirects = !!options.noRedirects;
     options.noLocalLinks = !!options.noLocalLinks;
     options.linksToIgnore = options.linksToIgnore || [];
     if (!Array.isArray(options.linksToIgnore)) {

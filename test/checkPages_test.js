@@ -258,14 +258,14 @@ exports.checkPages = {
       []));
   },
 
-  checkLinksDisallowRedirect: function(test) {
+  checkLinksNoRedirects: function(test) {
     test.expect(6);
     nockFiles(['redirectLink.html']);
     nockRedirect('redirect');
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/redirectLink.html'],
       checkLinks: true,
-      disallowRedirect: true
+      noRedirects: true
     }});
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/redirectLink.html (00ms)'],
