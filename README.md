@@ -55,6 +55,7 @@ grunt.initConfig({
         checkLinks: true,
         onlySameDomainLinks: true,
         disallowRedirect: false,
+        noLocalLinks, true,
         linksToIgnore: [
           'http://localhost:8080/broken.html'
         ],
@@ -137,6 +138,22 @@ Used by: `checkLinks`
 Set this option to `true` to block HTTP redirects by failing the task if any are encountered.
 
 This can be useful to ensure outgoing links are to the content's canonical location.
+
+#### noLocalLinks
+
+Type: `Boolean`  
+Default value: `false`  
+Used by: `checkLinks`
+
+Set this option to `true` to report an error if any links to [`localhost`](http://en.wikipedia.org/wiki/Localhost) are encountered.
+
+This is useful to detect temporary links that may work during development but would fail when deployed.
+
+The list of host names recognized as `localhost` are:
+
+* localhost
+* 127.0.0.1 (and the rest of the `127.0.0.0/8` address block)
+* ::1 (and its expanded forms)
 
 #### linksToIgnore
 

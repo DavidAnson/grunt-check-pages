@@ -7,10 +7,8 @@ var nock = require('nock');
 var gruntMock = require('gruntmock');
 var checkPages = require('../tasks/checkPages.js');
 
-// Block all unexpected network calls...
+// Block all unexpected network calls
 nock.disableNetConnect();
-// ... except deliberate connection errors
-nock.enableNetConnect('localhost');
 
 // Verify a task's output
 function testOutput(test, ok, error) {
@@ -290,6 +288,39 @@ exports.checkPages = {
        'Link: http://example.com/link1 (00ms)',
        'Link: http://example.com/link0 (00ms)'],
       []));
+  },
+
+  checkLinksNoLocalLinks: function(test) {
+    test.expect(16);
+    nockFiles(['localLinks.html']);
+    nock('http://localhost').head('/').reply(200);
+    nock('http://example.com').head('/').reply(200);
+    nock('http://127.0.0.1').head('/').reply(200);
+    nock('http://169.254.1.1').head('/').reply(200);
+    nock('http://localhost').head('/').reply(200); // [::1]
+    //nock('http://[ff02::1]').head('/').reply(200); // IPV6 unsupported by nock?
+    //nock('http://[0000:0000:0000:0000:0000:0000:0000:0001]').head('/').reply(200);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/localLinks.html'],
+      checkLinks: true,
+      noLocalLinks: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/localLinks.html (00ms)',
+       //'Link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
+       //'Link: http://[ff02::1]/ (00ms)',
+       'Link: http://[::1]/ (00ms)',
+       'Link: http://169.254.1.1/ (00ms)',
+       'Link: http://127.0.0.1/ (00ms)',
+       'Link: http://example.com/ (00ms)',
+       'Link: http://localhost/ (00ms)'],
+      ['Local link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/',
+       'Link error (Nock: Not allow net connect for "0000:80"): http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
+       'Link error (Nock: Not allow net connect for "ff02:80"): http://[ff02::1]/ (00ms)',
+       'Local link: http://[::1]/',
+       'Local link: http://127.0.0.1/',
+       'Local link: http://localhost/',
+       '6 issues, see above']));
   },
 
   checkLinksMultiplePages: function(test) {
@@ -678,6 +709,12 @@ exports.checkPages = {
   },
 
   // Connection errors
+
+  enableDeliberateConnectionErrors: function(test) {
+    test.expect(0);
+    nock.enableNetConnect('localhost');
+    test.done();
+  },
 
   pageConnectionError: function(test) {
     test.expect(5);

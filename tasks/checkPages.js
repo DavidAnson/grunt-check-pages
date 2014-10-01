@@ -180,6 +180,12 @@ module.exports = function(grunt) {
       if (options.disallowRedirect) {
         req.redirects(0);
       }
+      if (options.noLocalLinks) {
+        var localhost = /^(localhost)|(127\.\d\d?\d?\.\d\d?\d?\.\d\d?\d?)|(\[[0\:]*\:[0\:]*\:0?0?0?1\])$/i;
+        if (localhost.test(req.host)) {
+          logError('Local link: ' + link);
+        }
+      }
     };
   }
 
@@ -203,6 +209,7 @@ module.exports = function(grunt) {
     options.checkLinks = !!options.checkLinks;
     options.onlySameDomainLinks = !!options.onlySameDomainLinks;
     options.disallowRedirect = !!options.disallowRedirect;
+    options.noLocalLinks = !!options.noLocalLinks;
     options.linksToIgnore = options.linksToIgnore || [];
     if (!Array.isArray(options.linksToIgnore)) {
       grunt.fail.warn('linksToIgnore option is invalid; it should be an array');
