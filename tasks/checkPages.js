@@ -201,7 +201,7 @@ module.exports = function(grunt) {
     var options = this.options();
 
     if (options.src) {
-      options.pageUrls = grunt.file.readJSON(src);
+      options.pageUrls = grunt.file.readJSON(options.src);
     }
 
     if (!options.pageUrls) {
