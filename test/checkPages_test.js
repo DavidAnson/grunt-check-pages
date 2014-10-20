@@ -52,7 +52,9 @@ function nockRedirect(link, status) {
     .head(slashLink)
     .reply(status || 301, '', { 'Location': slashLink + '_redirected' })
     .get(slashLink)
-    .reply(status || 301, '', { 'Location': slashLink + '_redirected' });
+    .reply(status || 301, '', { 'Location': slashLink + '_redirected' })
+    .get(slashLink + '_redirected')
+    .reply(200);
 }
 
 exports.checkPages = {
@@ -173,9 +175,7 @@ exports.checkPages = {
     nockLinks([
       'link0', 'link1', 'link3', 'link4', 'link5',
       'link6', 'link7', 'link8', 'link9', 'link10',
-      'link11', 'link12', 'link13',
-      'movedTemporarily_redirected',
-      'movedPermanently_redirected']);
+      'link11', 'link12', 'link13']);
     nockRedirect('movedPermanently', 301);
     nockRedirect('movedTemporarily', 302);
     nockLinks(['link2'], 'http://example.org');
@@ -326,7 +326,7 @@ exports.checkPages = {
   checkLinksMultiplePages: function(test) {
     test.expect(10);
     nockFiles(['externalLink.html', 'redirectLink.html', 'ignoreLinks.html']);
-    nockLinks(['link', 'link0', 'link1', 'link2', 'redirect_redirected']);
+    nockLinks(['link', 'link0', 'link1', 'link2']);
     nockRedirect('redirect');
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/externalLink.html',
