@@ -10,6 +10,7 @@
 
 module.exports = function(grunt) {
   // Imports
+  var crypto = require('crypto');
   var url = require('url');
   var request = require('superagent');
   var cheerio = require('cheerio');
@@ -156,8 +157,22 @@ module.exports = function(grunt) {
   function testLink(link, options, retryWithGet) {
     return function (callback) {
       var start = Date.now();
+      var hash = null;
+      var linkHash = null;
+      if (options.queryHashes) {
+        var query = url.parse(link, true).query;
+        /* eslint-disable no-cond-assign */
+        if (linkHash = query.sha1) {
+          hash = crypto.createHash('sha1');
+        } else if (linkHash = query.md5) {
+          hash = crypto.createHash('md5');
+        } /*else if (linkHash = query.crc) {
+          hash = crypto.createHash('crc');
+        }*/
+        /* eslint-enable no-cond-assign */
+      }
       var req = request
-        [retryWithGet ? 'get' : 'head'](link)
+        [(retryWithGet || options.queryHashes) ? 'get' : 'head'](link)
         .use(setCommonHeaders)
         .buffer(false)
         .end(function(err, res) {
@@ -174,7 +189,21 @@ module.exports = function(grunt) {
             } else {
               grunt.log.ok('Link: ' + link + ' (' + elapsed + 'ms)');
             }
-            callback();
+            if (!err && res.ok && hash) {
+              hash.setEncoding('hex');
+              res.pipe(hash);
+              res.on('end', function() {
+                var contentHash = hash.read();
+                if (linkHash.toUpperCase() === contentHash.toUpperCase()) {
+                  grunt.log.ok('Hash: ' + link);
+                } else {
+                  logError('Hash error (' + contentHash.toLowerCase() + '): ' + link);
+                }
+                callback();
+              });
+            } else {
+              callback();
+            }
           }
         });
       if (options.noRedirects) {
@@ -210,6 +239,7 @@ module.exports = function(grunt) {
     options.onlySameDomainLinks = !!options.onlySameDomainLinks;
     options.noRedirects = !!options.noRedirects;
     options.noLocalLinks = !!options.noLocalLinks;
+    options.queryHashes = !!options.queryHashes;
     options.linksToIgnore = options.linksToIgnore || [];
     if (!Array.isArray(options.linksToIgnore)) {
       grunt.fail.warn('linksToIgnore option is invalid; it should be an array');

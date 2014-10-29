@@ -35,7 +35,7 @@ function nockFiles(files, base, headers) {
   files.forEach(function(file) {
     scope
       .get('/' + file)
-      .replyWithFile(200, path.join(__dirname, file), headers);
+      .replyWithFile(200, path.join(__dirname, file.split('?')[0]), headers);
   });
 }
 function nockLinks(links, base) {
@@ -321,6 +321,56 @@ exports.checkPages = {
        'Local link: http://127.0.0.1/',
        'Local link: http://localhost/',
        '6 issues, see above']));
+  },
+
+  checkLinksQueryHashes: function(test) {
+    test.expect(26);
+    nockFiles([
+      'queryHashes.html',
+      'brokenLinks.html?md5=abcd',
+      'externalLink.html?md5=9357B8FD6A13B3D1A6DBC00E6445E4FF',
+      'ignoreLinks.html?md5=4f47458e34bc855a46349c1335f58cc3',
+      'invalidEntity.html?field1=value&md5=fa3e4d3dc439fdb42d86855e516a92aa&field2=value',
+      'localLinks.html?crc=abcd',
+      'multipleErrors.html?crc=F88F0D21',
+      'redirectLink.html?crc=e4f013b5',
+      'retryWhenHeadFails.html?sha1=abcd',
+      'unclosedElement.html?sha1=1D9E557D3B99507E8582E67F235D3DE6DFA3717A',
+      'unclosedImg.html?sha1=9511fa1a787d021bdf3aa9538029a44209fb5c4c',
+      'validPage.html?field1=value&sha1=8ac1573c31b4f6132834523ac08de21c54138236&md5=abcd&crc=abcd&field2=value']);
+    nockFiles(['allBytes.txt?sha1=88d103ba1b5db29a2d83b92d09a725cb6d2673f9'], null, { 'Content-Type': 'application/octet-stream' });
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/queryHashes.html'],
+      checkLinks: true,
+      queryHashes: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/queryHashes.html (00ms)',
+       'Link: http://example.com/allBytes.txt?sha1=88d103ba1b5db29a2d83b92d09a725cb6d2673f9 (00ms)',
+       'Hash: http://example.com/allBytes.txt?sha1=88d103ba1b5db29a2d83b92d09a725cb6d2673f9',
+       'Link: http://example.com/validPage.html?field1=value&sha1=8ac1573c31b4f6132834523ac08de21c54138236&md5=abcd&crc=abcd&field2=value (00ms)',
+       'Hash: http://example.com/validPage.html?field1=value&sha1=8ac1573c31b4f6132834523ac08de21c54138236&md5=abcd&crc=abcd&field2=value',
+       'Link: http://example.com/unclosedImg.html?sha1=9511fa1a787d021bdf3aa9538029a44209fb5c4c (00ms)',
+       'Hash: http://example.com/unclosedImg.html?sha1=9511fa1a787d021bdf3aa9538029a44209fb5c4c',
+       'Link: http://example.com/unclosedElement.html?sha1=1D9E557D3B99507E8582E67F235D3DE6DFA3717A (00ms)',
+       'Hash: http://example.com/unclosedElement.html?sha1=1D9E557D3B99507E8582E67F235D3DE6DFA3717A',
+       'Link: http://example.com/retryWhenHeadFails.html?sha1=abcd (00ms)',
+       'Link: http://example.com/redirectLink.html?crc=e4f013b5 (00ms)',
+       //'Hash: http://example.com/redirectLink.html?crc=e4f013b5',
+       'Link: http://example.com/multipleErrors.html?crc=F88F0D21 (00ms)',
+       //'Hash: http://example.com/multipleErrors.html?crc=F88F0D21',
+       'Link: http://example.com/localLinks.html?crc=abcd (00ms)',
+       'Link: http://example.com/invalidEntity.html?field1=value&md5=fa3e4d3dc439fdb42d86855e516a92aa&field2=value (00ms)',
+       'Hash: http://example.com/invalidEntity.html?field1=value&md5=fa3e4d3dc439fdb42d86855e516a92aa&field2=value',
+       'Link: http://example.com/ignoreLinks.html?md5=4f47458e34bc855a46349c1335f58cc3 (00ms)',
+       'Hash: http://example.com/ignoreLinks.html?md5=4f47458e34bc855a46349c1335f58cc3',
+       'Link: http://example.com/externalLink.html?md5=9357B8FD6A13B3D1A6DBC00E6445E4FF (00ms)',
+       'Hash: http://example.com/externalLink.html?md5=9357B8FD6A13B3D1A6DBC00E6445E4FF',
+       'Link: http://example.com/brokenLinks.html?md5=abcd (00ms)'],
+      ['Hash error (1353361bfade29f3684fe17c8b388dadbc49cb6d): http://example.com/retryWhenHeadFails.html?sha1=abcd',
+       //'Hash error (73fb7b7a): http://example.com/localLinks.html?crc=abcd',
+       'Hash error (7f5a1ac1e6dc59679f36482973efc871): http://example.com/brokenLinks.html?md5=abcd',
+       '2 issues, see above']));
   },
 
   checkLinksMultiplePages: function(test) {
