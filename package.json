@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "cheerio": "^0.17.0",
+    "crc": "3.0.0",
     "sax": "^0.6.0",
     "superagent": "^0.20.0"
   },

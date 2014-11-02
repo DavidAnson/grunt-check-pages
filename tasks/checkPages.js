@@ -15,6 +15,7 @@ module.exports = function(grunt) {
   var request = require('superagent');
   var cheerio = require('cheerio');
   var sax = require('sax');
+  var crchash = require('./crchash');
 
   // Global variables
   var userAgent = 'grunt-check-pages/' + require('../package.json').version;
@@ -166,9 +167,9 @@ module.exports = function(grunt) {
           hash = crypto.createHash('sha1');
         } else if (linkHash = query.md5) {
           hash = crypto.createHash('md5');
-        } /*else if (linkHash = query.crc) {
-          hash = crypto.createHash('crc');
-        }*/
+        } else if (linkHash = query.crc32) {
+          hash = crchash.createHash('crc32');
+        }
         /* eslint-enable no-cond-assign */
       }
       var req = request
