@@ -172,39 +172,50 @@ module.exports = function(grunt) {
         }
         /* eslint-enable no-cond-assign */
       }
+      var useGetRequest = retryWithGet || options.queryHashes;
       var req = request
-        [(retryWithGet || options.queryHashes) ? 'get' : 'head'](link)
+        [useGetRequest ? 'get' : 'head'](link)
         .use(setCommonHeaders)
         .buffer(false)
+        .parse(function(res, cb) {
+          // Custom parser prevents superagent from using one of its own
+          res.on('end', cb);
+        })
         .end(function(err, res) {
-          var elapsed = Date.now() - start;
-          if (!err && !res.ok && !retryWithGet) {
-            // Retry HEAD request as GET to be sure
-            testLink(link, options, true)(callback);
+          if (err) {
+            var elapsed = Date.now() - start;
+            logError('Link error (' + err.message + '): ' + link + ' (' + elapsed + 'ms)');
+            req.abort();
+            callback();
           } else {
-            if (err) {
-              logError('Link error (' + err.message + '): ' + link + ' (' + elapsed + 'ms)');
-              req.abort();
-            } else if (!res.ok) {
-              logError('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
-            } else {
-              grunt.log.ok('Link: ' + link + ' (' + elapsed + 'ms)');
-            }
-            if (!err && res.ok && hash) {
+            if (hash) {
               hash.setEncoding('hex');
-              res.pipe(hash);
-              res.on('end', function() {
-                var contentHash = hash.read();
-                if (linkHash.toUpperCase() === contentHash.toUpperCase()) {
-                  grunt.log.ok('Hash: ' + link);
-                } else {
-                  logError('Hash error (' + contentHash.toLowerCase() + '): ' + link);
-                }
-                callback();
+              res.on('data', function(chunk) {
+                hash.write(chunk);
               });
-            } else {
-              callback();
             }
+            res.on('end', function() {
+              var elapsed = Date.now() - start;
+              if (res.ok) {
+                grunt.log.ok('Link: ' + link + ' (' + elapsed + 'ms)');
+                if (hash) {
+                  hash.end();
+                  var contentHash = hash.read();
+                  if (linkHash.toUpperCase() === contentHash.toUpperCase()) {
+                    grunt.log.ok('Hash: ' + link);
+                  } else {
+                    logError('Hash error (' + contentHash.toLowerCase() + '): ' + link);
+                  }
+                }
+              } else if (useGetRequest) {
+                logError('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
+              } else {
+                // Retry HEAD request as GET to be sure
+                testLink(link, options, true)(callback);
+                return;
+              }
+              callback();
+            });
           }
         });
       if (options.noRedirects) {
