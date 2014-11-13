@@ -31,6 +31,7 @@ By providing a list of pages to scan, the task can:
 
 * Validate each page is accessible
 * Validate all links point to accessible content (similar to the [W3C Link Checker](http://validator.w3.org/checklink))
+* Validate links with query string [file hashes](http://en.wikipedia.org/wiki/List_of_hash_functions) have the expected content
 * Validate page structure for XHTML compliance (akin to the [W3C Markup Validation Service](http://validator.w3.org/))
 * Validate a page's response time is below some threshold
 * Validate a page takes advantage of [caching for better performance](https://developers.google.com/speed/docs/insights/LeverageBrowserCaching)
@@ -54,6 +55,7 @@ grunt.initConfig({
         ],
         checkLinks: true,
         onlySameDomainLinks: true,
+        queryHashes: true,
         noRedirects: true,
         noLocalLinks, true,
         linksToIgnore: [
@@ -128,6 +130,22 @@ Used by: `checkLinks`
 Set this option to `true` to block the checking of links on different domains than the referring page.
 
 This can be useful during development when external sites aren't changing and don't need to be checked.
+
+#### queryHashes
+
+Type: `Boolean`  
+Default value: `false`  
+Used by: `checkLinks`
+
+Set this option to `true` to verify links with [file hashes](http://en.wikipedia.org/wiki/List_of_hash_functions) in the query string point to content that hashes to the expected value.
+
+Query hashes can be used to [invalidate cached responses](https://developers.google.com/web/fundamentals/performance/optimizing-content-efficiency/http-caching#invalidating-and-updating-cached-responses) when [leveraging browser caching](https://developers.google.com/speed/docs/insights/LeverageBrowserCaching) via long cache lifetimes.
+
+Supported hash functions are:
+
+* image.png?[crc32](http://en.wikipedia.org/wiki/Cyclic_redundancy_check)=e4f013b5
+* styles.css?[md5](http://en.wikipedia.org/wiki/MD5)=4f47458e34bc855a46349c1335f58cc3
+* archive.zip?[sha1](http://en.wikipedia.org/wiki/SHA-1)=9511fa1a787d021bdf3aa9538029a44209fb5c4c
 
 #### noRedirects
 
