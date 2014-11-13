@@ -20,9 +20,6 @@ util.inherits(Crc32Hash, Transform);
 
 // Constructor
 function Crc32Hash(options) {
-  if (!(this instanceof Crc32Hash)) {
-    return new Crc32Hash(options);
-  }
   Transform.call(this, options);
   this.value = 0;
 }

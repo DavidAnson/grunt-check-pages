@@ -324,7 +324,7 @@ exports.checkPages = {
   },
 
   checkLinksQueryHashes: function(test) {
-    test.expect(33);
+    test.expect(34);
     zlib.gzip('Compressed content', function(err, buf) {
       if (!err) {
         nock('http://example.com')
@@ -347,6 +347,7 @@ exports.checkPages = {
           'validPage.html?field1=value&sha1=8ac1573c31b4f6132834523ac08de21c54138236&md5=abcd&crc32=abcd&field2=value']);
         nockFiles(['allBytes.txt?sha1=88d103ba1b5db29a2d83b92d09a725cb6d2673f9'], null, { 'Content-Type': 'application/octet-stream' });
         nockFiles(['image.png?md5=e3ece6e91045f18ce18ac25455524cd0'], null, { 'Content-Type': 'image/png' });
+        nockFiles(['image.png?key=value']);
         var mock = gruntMock.create({ options: {
           pageUrls: ['http://example.com/queryHashes.html'],
           checkLinks: true,
@@ -356,6 +357,7 @@ exports.checkPages = {
           ['Page: http://example.com/queryHashes.html (00ms)',
            'Link: http://example.com/compressed?crc32=3477f8a8 (00ms)',
            'Hash: http://example.com/compressed?crc32=3477f8a8',
+           'Link: http://example.com/image.png?key=value (00ms)',
            'Link: http://example.com/image.png?md5=e3ece6e91045f18ce18ac25455524cd0 (00ms)',
            'Hash: http://example.com/image.png?md5=e3ece6e91045f18ce18ac25455524cd0',
            'Link: http://example.com/allBytes.txt?sha1=88d103ba1b5db29a2d83b92d09a725cb6d2673f9 (00ms)',

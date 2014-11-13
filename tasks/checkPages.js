@@ -162,15 +162,16 @@ module.exports = function(grunt) {
       var linkHash = null;
       if (options.queryHashes) {
         var query = url.parse(link, true).query;
-        /* eslint-disable no-cond-assign */
-        if (linkHash = query.sha1) {
+        if (query.sha1) {
+          linkHash = query.sha1;
           hash = crypto.createHash('sha1');
-        } else if (linkHash = query.md5) {
+        } else if (query.md5) {
+          linkHash = query.md5;
           hash = crypto.createHash('md5');
-        } else if (linkHash = query.crc32) {
+        } else if (query.crc32) {
+          linkHash = query.crc32;
           hash = crchash.createHash('crc32');
         }
-        /* eslint-enable no-cond-assign */
       }
       var useGetRequest = retryWithGet || options.queryHashes;
       var req = request
