@@ -57,7 +57,7 @@ grunt.initConfig({
         onlySameDomainLinks: true,
         queryHashes: true,
         noRedirects: true,
-        noLocalLinks, true,
+        noLocalLinks: true,
         linksToIgnore: [
           'http://localhost:8080/broken.html'
         ],
