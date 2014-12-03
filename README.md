@@ -96,6 +96,8 @@ Default value: `undefined`
 
 URLs must be absolute and can point to local or remote content. The `pageUrls` array can be empty, but must be present.
 
+To store the list outside `Gruntfile.js`, read the array from a JSON file instead: `pageUrls: grunt.file.readJSON('pageUrls.json')`.
+
 #### checkLinks
 
 Type: `Boolean`  
