@@ -241,6 +241,11 @@ module.exports = function(grunt) {
 
     // Check for required options
     var options = this.options();
+
+    if (options.src) {
+      options.pageUrls = grunt.file.readJSON(options.src);
+    }
+
     if (!options.pageUrls) {
       grunt.fail.warn('pageUrls option is not present; it should be an array of URLs');
     } else if (!Array.isArray(options.pageUrls)) {
