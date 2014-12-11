@@ -50,7 +50,7 @@ module.exports = function(grunt) {
   }
 
   // Adds pending callbacks for all links matching <element attribute='*'/>
-  function addLinks($, element, attribute, base, options) {
+  function addLinks($, element, attribute, base, options, index) {
     var baseHostname = url.parse(base).hostname;
     $(element).each(function() {
       var link = $(this).attr(attribute);
@@ -58,11 +58,13 @@ module.exports = function(grunt) {
         var resolvedLink = url.resolve(base, link);
         if ((!options.onlySameDomainLinks || (url.parse(resolvedLink).hostname === baseHostname)) &&
            !isLinkIgnored(resolvedLink, options)) {
-          // Add to front of queue so it gets processed before the next page
-          pendingCallbacks.unshift(testLink(resolvedLink, options));
+          // Add to beginning of queue (in order) so links gets processed before the next page
+          pendingCallbacks.splice(index, 0, testLink(resolvedLink, options));
+          index++;
         }
       }
     });
+    return index;
   }
 
   // Returns a callback to test the specified page
@@ -86,19 +88,20 @@ module.exports = function(grunt) {
 
               // Check the page's links for validity (i.e., HTTP HEAD returns OK)
               var $ = cheerio.load(res.text);
-              addLinks($, 'a', 'href', page, options);
-              addLinks($, 'area', 'href', page, options);
-              addLinks($, 'audio', 'src', page, options);
-              addLinks($, 'embed', 'src', page, options);
-              addLinks($, 'iframe', 'src', page, options);
-              addLinks($, 'img', 'src', page, options);
-              addLinks($, 'input', 'src', page, options);
-              addLinks($, 'link', 'href', page, options);
-              addLinks($, 'object', 'data', page, options);
-              addLinks($, 'script', 'src', page, options);
-              addLinks($, 'source', 'src', page, options);
-              addLinks($, 'track', 'src', page, options);
-              addLinks($, 'video', 'src', page, options);
+              var index = 0;
+              index = addLinks($, 'a', 'href', page, options, index);
+              index = addLinks($, 'area', 'href', page, options, index);
+              index = addLinks($, 'audio', 'src', page, options, index);
+              index = addLinks($, 'embed', 'src', page, options, index);
+              index = addLinks($, 'iframe', 'src', page, options, index);
+              index = addLinks($, 'img', 'src', page, options, index);
+              index = addLinks($, 'input', 'src', page, options, index);
+              index = addLinks($, 'link', 'href', page, options, index);
+              index = addLinks($, 'object', 'data', page, options, index);
+              index = addLinks($, 'script', 'src', page, options, index);
+              index = addLinks($, 'source', 'src', page, options, index);
+              index = addLinks($, 'track', 'src', page, options, index);
+              index = addLinks($, 'video', 'src', page, options, index);
             }
             if (options.checkXhtml) {
 
