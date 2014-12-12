@@ -17,7 +17,7 @@ var Transform = stream.Transform;
 // Constructor
 function Crc32Hash(options) {
   Transform.call(this, options);
-  this.value = 0;
+  this.value = undefined;
 }
 
 // Subclass

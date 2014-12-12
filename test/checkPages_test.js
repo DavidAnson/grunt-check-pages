@@ -325,7 +325,7 @@ exports.checkPages = {
   },
 
   checkLinksQueryHashes: function(test) {
-    test.expect(34);
+    test.expect(36);
     zlib.gzip('Compressed content', function(err, buf) {
       if (!err) {
         nock('http://example.com')
@@ -346,6 +346,7 @@ exports.checkPages = {
           'unclosedElement.html?sha1=1D9E557D3B99507E8582E67F235D3DE6DFA3717A',
           'unclosedImg.html?sha1=9511fa1a787d021bdf3aa9538029a44209fb5c4c',
           'validPage.html?field1=value&sha1=8ac1573c31b4f6132834523ac08de21c54138236&md5=abcd&crc32=abcd&field2=value']);
+        nock('http://example.com').get('/noBytes.txt?crc32=00000000').reply(200, '', { 'Content-Type': 'application/octet-stream' });
         nockFiles(['allBytes.txt?sha1=88d103ba1b5db29a2d83b92d09a725cb6d2673f9'], null, { 'Content-Type': 'application/octet-stream' });
         nockFiles(['image.png?md5=e3ece6e91045f18ce18ac25455524cd0'], null, { 'Content-Type': 'image/png' });
         nockFiles(['image.png?key=value']);
@@ -375,6 +376,8 @@ exports.checkPages = {
            'Hash: http://example.com/unclosedImg.html?sha1=9511fa1a787d021bdf3aa9538029a44209fb5c4c',
            'Link: http://example.com/validPage.html?field1=value&sha1=8ac1573c31b4f6132834523ac08de21c54138236&md5=abcd&crc32=abcd&field2=value (00ms)',
            'Hash: http://example.com/validPage.html?field1=value&sha1=8ac1573c31b4f6132834523ac08de21c54138236&md5=abcd&crc32=abcd&field2=value',
+           'Link: http://example.com/noBytes.txt?crc32=00000000 (00ms)',
+           'Hash: http://example.com/noBytes.txt?crc32=00000000',
            'Link: http://example.com/allBytes.txt?sha1=88d103ba1b5db29a2d83b92d09a725cb6d2673f9 (00ms)',
            'Hash: http://example.com/allBytes.txt?sha1=88d103ba1b5db29a2d83b92d09a725cb6d2673f9',
            'Link: http://example.com/image.png?md5=e3ece6e91045f18ce18ac25455524cd0 (00ms)',

@@ -27,10 +27,10 @@
     "test": "grunt nodeunit"
   },
   "dependencies": {
-    "cheerio": "^0.17.0",
-    "crc": "3.0.0",
-    "sax": "^0.6.0",
-    "superagent": "^0.20.0"
+    "cheerio": "^0.18.0",
+    "crc": "3.2.1",
+    "sax": "^0.6.1",
+    "superagent": "^0.21.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
@@ -38,7 +38,7 @@
     "grunt-contrib-watch": "^0.6.1",
     "grunt-eslint": "^2.1.0",
     "gruntmock": "^0.1.1",
-    "nock": "^0.48.0"
+    "nock": "^0.51.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.4"
