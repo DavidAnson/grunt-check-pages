@@ -49,114 +49,6 @@ module.exports = function(grunt) {
     });
   }
 
-  // Adds pending callbacks for all links matching <element attribute='*'/>
-  function addLinks($, element, attribute, base, options, index) {
-    var baseHostname = url.parse(base).hostname;
-    $(element).each(function() {
-      var link = $(this).attr(attribute);
-      if (link) {
-        var resolvedLink = url.resolve(base, link);
-        if ((!options.onlySameDomainLinks || (url.parse(resolvedLink).hostname === baseHostname)) &&
-           !isLinkIgnored(resolvedLink, options)) {
-          // Add to beginning of queue (in order) so links gets processed before the next page
-          pendingCallbacks.splice(index, 0, testLink(resolvedLink, options));
-          index++;
-        }
-      }
-    });
-    return index;
-  }
-
-  // Returns a callback to test the specified page
-  function testPage(page, options) {
-    return function (callback) {
-      var start = Date.now();
-      var req = request
-        .get(page)
-        .use(setCommonHeaders)
-        .buffer(true)
-        .end(function(err, res) {
-          var elapsed = Date.now() - start;
-          if (err) {
-            logError('Page error (' + err.message + '): ' + page + ' (' + elapsed + 'ms)');
-            req.abort();
-          } else if (!res.ok) {
-            logError('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
-          } else {
-            grunt.log.ok('Page: ' + page + ' (' + elapsed + 'ms)');
-            if (options.checkLinks) {
-
-              // Check the page's links for validity (i.e., HTTP HEAD returns OK)
-              var $ = cheerio.load(res.text);
-              var index = 0;
-              index = addLinks($, 'a', 'href', page, options, index);
-              index = addLinks($, 'area', 'href', page, options, index);
-              index = addLinks($, 'audio', 'src', page, options, index);
-              index = addLinks($, 'embed', 'src', page, options, index);
-              index = addLinks($, 'iframe', 'src', page, options, index);
-              index = addLinks($, 'img', 'src', page, options, index);
-              index = addLinks($, 'input', 'src', page, options, index);
-              index = addLinks($, 'link', 'href', page, options, index);
-              index = addLinks($, 'object', 'data', page, options, index);
-              index = addLinks($, 'script', 'src', page, options, index);
-              index = addLinks($, 'source', 'src', page, options, index);
-              index = addLinks($, 'track', 'src', page, options, index);
-              index = addLinks($, 'video', 'src', page, options, index);
-            }
-            if (options.checkXhtml) {
-
-              // Check the page's structure for XHTML compliance
-              var parser = sax.parser(true);
-              parser.onerror = function(error) {
-                logError(error.message.replace(/\n/g, ', '));
-              };
-              parser.write(res.text);
-            }
-            if (options.maxResponseTime) {
-
-              // Check the page's response time
-              if (options.maxResponseTime < elapsed) {
-                logError('Page response took more than ' + options.maxResponseTime + 'ms to complete');
-              }
-            }
-            if (options.checkCaching) {
-
-              // Check the page's cache headers
-              var cacheControl = res.headers['cache-control'];
-              if (cacheControl) {
-                if (!/max-age|max-stale|min-fresh|must-revalidate|no-cache|no-store|no-transform|only-if-cached|private|proxy-revalidate|public|s-maxage/.test(cacheControl)) {
-                  logError('Invalid Cache-Control header in response: ' + cacheControl);
-                }
-              } else {
-                logError('Missing Cache-Control header in response');
-              }
-              var etag = res.headers.etag;
-              if (etag) {
-                if (!/^(W\/)?\"[^\"]*\"$/.test(etag)) {
-                  logError('Invalid ETag header in response: ' + etag);
-                }
-              } else if (!cacheControl || !/no-cache|max-age=0/.test(cacheControl)) { // Don't require ETag for responses that won't be cached
-                logError('Missing ETag header in response');
-              }
-            }
-            if (options.checkCompression) {
-
-              // Check that the page was compressed (superagent always sets Accept-Encoding to gzip/deflate)
-              var contentEncoding = res.headers['content-encoding'];
-              if (contentEncoding) {
-                if (!/^(deflate|gzip)$/.test(contentEncoding)) {
-                  logError('Invalid Content-Encoding header in response: ' + contentEncoding);
-                }
-              } else {
-                logError('Missing Content-Encoding header in response');
-              }
-            }
-          }
-          callback();
-        });
-    };
-  }
-
   // Returns a callback to test the specified link
   function testLink(link, options, retryWithGet) {
     return function (callback) {
@@ -187,8 +79,7 @@ module.exports = function(grunt) {
         })
         .end(function(err, res) {
           if (err) {
-            var elapsed = Date.now() - start;
-            logError('Link error (' + err.message + '): ' + link + ' (' + elapsed + 'ms)');
+            logError('Link error (' + err.message + '): ' + link + ' (' + (Date.now() - start) + 'ms)');
             req.abort();
             callback();
           } else {
@@ -234,9 +125,111 @@ module.exports = function(grunt) {
     };
   }
 
+  // Adds pending callbacks for all links matching <element attribute='*'/>
+  function addLinks($, element, attribute, base, options, index) {
+    var baseHostname = url.parse(base).hostname;
+    $(element).each(function() {
+      var link = $(this).attr(attribute);
+      if (link) {
+        var resolvedLink = url.resolve(base, link);
+        if ((!options.onlySameDomainLinks || (url.parse(resolvedLink).hostname === baseHostname)) &&
+           !isLinkIgnored(resolvedLink, options)) {
+          // Add to beginning of queue (in order) so links gets processed before the next page
+          pendingCallbacks.splice(index, 0, testLink(resolvedLink, options));
+          index++;
+        }
+      }
+    });
+    return index;
+  }
+
+  // Returns a callback to test the specified page
+  function testPage(page, options) {
+    return function (callback) {
+      var start = Date.now();
+      var req = request
+        .get(page)
+        .use(setCommonHeaders)
+        .buffer(true)
+        .end(function(err, res) {
+          var elapsed = Date.now() - start;
+          if (err) {
+            logError('Page error (' + err.message + '): ' + page + ' (' + elapsed + 'ms)');
+            req.abort();
+          } else if (!res.ok) {
+            logError('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
+          } else {
+            grunt.log.ok('Page: ' + page + ' (' + elapsed + 'ms)');
+            if (options.checkLinks) {
+              // Check the page's links for validity (i.e., HTTP HEAD returns OK)
+              var $ = cheerio.load(res.text);
+              var index = 0;
+              index = addLinks($, 'a', 'href', page, options, index);
+              index = addLinks($, 'area', 'href', page, options, index);
+              index = addLinks($, 'audio', 'src', page, options, index);
+              index = addLinks($, 'embed', 'src', page, options, index);
+              index = addLinks($, 'iframe', 'src', page, options, index);
+              index = addLinks($, 'img', 'src', page, options, index);
+              index = addLinks($, 'input', 'src', page, options, index);
+              index = addLinks($, 'link', 'href', page, options, index);
+              index = addLinks($, 'object', 'data', page, options, index);
+              index = addLinks($, 'script', 'src', page, options, index);
+              index = addLinks($, 'source', 'src', page, options, index);
+              index = addLinks($, 'track', 'src', page, options, index);
+              index = addLinks($, 'video', 'src', page, options, index);
+            }
+            if (options.checkXhtml) {
+              // Check the page's structure for XHTML compliance
+              var parser = sax.parser(true);
+              parser.onerror = function(error) {
+                logError(error.message.replace(/\n/g, ', '));
+              };
+              parser.write(res.text);
+            }
+            if (options.maxResponseTime) {
+              // Check the page's response time
+              if (options.maxResponseTime < elapsed) {
+                logError('Page response took more than ' + options.maxResponseTime + 'ms to complete');
+              }
+            }
+            if (options.checkCaching) {
+              // Check the page's cache headers
+              var cacheControl = res.headers['cache-control'];
+              if (cacheControl) {
+                if (!/max-age|max-stale|min-fresh|must-revalidate|no-cache|no-store|no-transform|only-if-cached|private|proxy-revalidate|public|s-maxage/.test(cacheControl)) {
+                  logError('Invalid Cache-Control header in response: ' + cacheControl);
+                }
+              } else {
+                logError('Missing Cache-Control header in response');
+              }
+              var etag = res.headers.etag;
+              if (etag) {
+                if (!/^(W\/)?\"[^\"]*\"$/.test(etag)) {
+                  logError('Invalid ETag header in response: ' + etag);
+                }
+              } else if (!cacheControl || !/no-cache|max-age=0/.test(cacheControl)) { // Don't require ETag for responses that won't be cached
+                logError('Missing ETag header in response');
+              }
+            }
+            if (options.checkCompression) {
+              // Check that the page was compressed (superagent always sets Accept-Encoding to gzip/deflate)
+              var contentEncoding = res.headers['content-encoding'];
+              if (contentEncoding) {
+                if (!/^(deflate|gzip)$/.test(contentEncoding)) {
+                  logError('Invalid Content-Encoding header in response: ' + contentEncoding);
+                }
+              } else {
+                logError('Missing Content-Encoding header in response');
+              }
+            }
+          }
+          callback();
+        });
+    };
+  }
+
   // Register the task with Grunt
   grunt.registerMultiTask('checkPages', 'Checks various aspects of a web page for correctness.', function() {
-
     // Check for unsupported use
     if (this.files.length) {
       grunt.fail.warn('checkPages task does not use files; remove the files parameter');

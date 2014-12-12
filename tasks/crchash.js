@@ -14,15 +14,14 @@ var util = require('util');
 var crc = require('crc');
 var Transform = stream.Transform;
 
-// Crc32Hash class
-
-util.inherits(Crc32Hash, Transform);
-
 // Constructor
 function Crc32Hash(options) {
   Transform.call(this, options);
   this.value = 0;
 }
+
+// Subclass
+util.inherits(Crc32Hash, Transform);
 
 // Transform function implementations
 /* eslint-disable no-underscore-dangle */

@@ -298,8 +298,8 @@ exports.checkPages = {
     nock('http://127.0.0.1').head('/').reply(200);
     nock('http://169.254.1.1').head('/').reply(200);
     nock('http://localhost').head('/').reply(200); // [::1]
-    //nock('http://[ff02::1]').head('/').reply(200); // IPV6 unsupported by nock?
-    //nock('http://[0000:0000:0000:0000:0000:0000:0000:0001]').head('/').reply(200);
+    // nock('http://[ff02::1]').head('/').reply(200); // IPV6 unsupported by nock?
+    // nock('http://[0000:0000:0000:0000:0000:0000:0000:0001]').head('/').reply(200);
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/localLinks.html'],
       checkLinks: true,
@@ -312,8 +312,8 @@ exports.checkPages = {
        'Link: http://127.0.0.1/ (00ms)',
        'Link: http://169.254.1.1/ (00ms)',
        'Link: http://[::1]/ (00ms)'],
-       //'Link: http://[ff02::1]/ (00ms)',
-       //'Link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
+       // 'Link: http://[ff02::1]/ (00ms)',
+       // 'Link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
       [
        'Local link: http://localhost/',
        'Local link: http://127.0.0.1/',
@@ -455,7 +455,7 @@ exports.checkPages = {
        '1 issue, see above']));
   },
 
-  checkXhtmlInvalidEntity : function(test) {
+  checkXhtmlInvalidEntity: function(test) {
     test.expect(6);
     nockFiles(['invalidEntity.html']);
     var mock = gruntMock.create({ options: {
@@ -468,7 +468,7 @@ exports.checkPages = {
        '1 issue, see above']));
   },
 
-  checkXhtmlMultipleErrors : function(test) {
+  checkXhtmlMultipleErrors: function(test) {
     test.expect(7);
     nockFiles(['multipleErrors.html']);
     var mock = gruntMock.create({ options: {
