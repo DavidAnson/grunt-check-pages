@@ -243,14 +243,14 @@ exports.checkPages = {
       []));
   },
 
-  checkLinksOnlySameDomainLinks: function(test) {
+  checkLinksonlySameDomain: function(test) {
     test.expect(4);
     nockFiles(['externalLink.html']);
     nockLinks(['link']);
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/externalLink.html'],
       checkLinks: true,
-      onlySameDomainLinks: true
+      onlySameDomain: true
     }});
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/externalLink.html (00ms)',
@@ -403,7 +403,7 @@ exports.checkPages = {
                  'http://example.com/redirectLink.html',
                  'http://example.com/ignoreLinks.html'],
       checkLinks: true,
-      onlySameDomainLinks: true,
+      onlySameDomain: true,
       linksToIgnore: ['http://example.com/ignore0', 'http://example.com/ignore1']
     }});
     mock.invoke(checkPages, testOutput(test,

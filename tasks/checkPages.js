@@ -132,7 +132,7 @@ module.exports = function(grunt) {
       var link = $(this).attr(attribute);
       if (link) {
         var resolvedLink = url.resolve(base, link);
-        if ((!options.onlySameDomainLinks || (url.parse(resolvedLink).hostname === baseHostname)) &&
+        if ((!options.onlySameDomain || (url.parse(resolvedLink).hostname === baseHostname)) &&
            !isLinkIgnored(resolvedLink, options)) {
           // Add to beginning of queue (in order) so links gets processed before the next page
           pendingCallbacks.splice(index, 0, testLink(resolvedLink, options));
@@ -245,7 +245,7 @@ module.exports = function(grunt) {
 
     // Check for and normalize optional options
     options.checkLinks = !!options.checkLinks;
-    options.onlySameDomainLinks = !!options.onlySameDomainLinks;
+    options.onlySameDomain = !!options.onlySameDomain;
     options.noRedirects = !!options.noRedirects;
     options.noLocalLinks = !!options.noLocalLinks;
     options.queryHashes = !!options.queryHashes;

@@ -54,7 +54,7 @@ grunt.initConfig({
           'http://localhost:8080/about.html'
         ],
         checkLinks: true,
-        onlySameDomainLinks: true,
+        onlySameDomain: true,
         queryHashes: true,
         noRedirects: true,
         noLocalLinks: true,
@@ -123,7 +123,7 @@ The following element/attribute pairs are used to identify links:
 * `track`/`src`
 * `video`/`src`
 
-#### onlySameDomainLinks
+#### onlySameDomain
 
 Type: `Boolean`  
 Default value: `false`  
