@@ -204,6 +204,27 @@ exports.checkPages = {
       []));
   },
 
+  checkRelativeLinksValid: function(test) {
+    test.expect(9);
+    nockFiles(['dir/relativePage.html']);
+    nockLinks([
+      'dir/link0', 'dir/link1', 'link2',
+      'dir/sub/link3', 'dir/sub/link4', 'link5']);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/dir/relativePage.html'],
+      checkLinks: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/dir/relativePage.html (00ms)',
+       'Link: http://example.com/dir/link0 (00ms)',
+       'Link: http://example.com/dir/link1 (00ms)',
+       'Link: http://example.com/link2 (00ms)',
+       'Link: http://example.com/dir/sub/link3 (00ms)',
+       'Link: http://example.com/dir/sub/link4 (00ms)',
+       'Link: http://example.com/link5 (00ms)'],
+      []));
+  },
+
   checkLinksInvalid: function(test) {
     test.expect(10);
     nockFiles(['brokenLinks.html']);
