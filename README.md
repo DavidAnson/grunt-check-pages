@@ -241,3 +241,4 @@ This is useful for pages that alter their behavior based on the user agent. Sett
 * 0.1.5 - Support `userAgent` option, weak entity tags, update `nock` dependency.
 * 0.2.0 - Support `noLocalLinks` option, rename `disallowRedirect` option to `noRedirects`, switch to [`ESLint`](http://eslint.org/), update `superagent` and `nock` dependencies.
 * 0.3.0 - Support `queryHashes` option for CRC-32/MD5/SHA-1, update `superagent` dependency.
+* 0.4.0 - Rename `onlySameDomainLinks` option to `onlySameDomain`, make link analysis match page sequence, update all dependencies.
