@@ -122,15 +122,22 @@ exports.checkPages = {
   },
 
   pageUrlsValid: function(test) {
-    test.expect(4);
-    nockFiles(['validPage.html', 'externalLink.html']);
+    test.expect(5);
+    nockFiles(['validPage.html', 'externalLink.html', 'localLinks.html']);
+    nock('http://example.com')
+      .get('/redirect')
+      .reply(301, '', { 'Location': 'http://example.com/redirect2' })
+      .get('/redirect2')
+      .reply(301, '', { 'Location': 'http://example.com/localLinks.html' });
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/validPage.html',
-                 'http://example.com/externalLink.html']
+                 'http://example.com/externalLink.html',
+                 'http://example.com/redirect']
     }});
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/validPage.html (00ms)',
-       'Page: http://example.com/externalLink.html (00ms)'],
+       'Page: http://example.com/externalLink.html (00ms)',
+       'Page: http://example.com/redirect -> http://example.com/localLinks.html (00ms)'],
       []));
   },
 
@@ -239,7 +246,7 @@ exports.checkPages = {
       checkLinks: true
     }});
     mock.invoke(checkPages, testOutput(test,
-      ['Page: http://example.com/dir (00ms)',
+      ['Page: http://example.com/dir -> http://example.com/dir/relativePage.html (00ms)',
        'Link: http://example.com/dir/link0 (00ms)',
        'Link: http://example.com/dir/link1 (00ms)',
        'Link: http://example.com/link2 (00ms)',
@@ -264,7 +271,7 @@ exports.checkPages = {
       checkLinks: true
     }});
     mock.invoke(checkPages, testOutput(test,
-      ['Page: http://example.com/dir (00ms)',
+      ['Page: http://example.com/dir -> http://example.com/dir/ (00ms)',
        'Link: http://example.com/dir/link0 (00ms)',
        'Link: http://example.com/dir/link1 (00ms)',
        'Link: http://example.com/link2 (00ms)',

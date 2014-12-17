@@ -159,9 +159,13 @@ module.exports = function(grunt) {
           } else if (!res.ok) {
             logError('Bad page (' + res.status + '): ' + page + ' (' + elapsed + 'ms)');
           } else {
-            grunt.log.ok('Page: ' + page + ' (' + elapsed + 'ms)');
-            // Update page to account for redirects
-            page = req.url;
+            if (page === req.url) {
+              grunt.log.ok('Page: ' + page + ' (' + elapsed + 'ms)');
+            } else {
+              grunt.log.ok('Page: ' + page + ' -> ' + req.url + ' (' + elapsed + 'ms)');
+              // Update page to account for redirects
+              page = req.url;
+            }
             if (options.checkLinks) {
               // Check the page's links for validity (i.e., HTTP HEAD returns OK)
               var $ = cheerio.load(res.text);
