@@ -46,13 +46,13 @@ function nockLinks(links, base) {
       .reply(200);
   });
 }
-function nockRedirect(link, status) {
+function nockRedirect(link, status, noLocation) {
   var slashLink = '/' + link;
   nock('http://example.com')
     .head(slashLink)
-    .reply(status || 301, '', { 'Location': slashLink + '_redirected' })
+    .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' })
     .get(slashLink)
-    .reply(status || 301, '', { 'Location': slashLink + '_redirected' })
+    .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' })
     .get(slashLink + '_redirected')
     .reply(200);
 }
@@ -336,9 +336,10 @@ exports.checkPages = {
   },
 
   checkLinksNoRedirects: function(test) {
-    test.expect(6);
+    test.expect(7);
     nockFiles(['redirectLink.html']);
-    nockRedirect('redirect');
+    nockRedirect('movedPermanently', 301);
+    nockRedirect('movedTemporarily', 302, true);
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/redirectLink.html'],
       checkLinks: true,
@@ -346,8 +347,9 @@ exports.checkPages = {
     }});
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/redirectLink.html (00ms)'],
-      ['Bad link (301): http://example.com/redirect (00ms)',
-       '1 issue, see above']));
+      ['Redirected link (301): http://example.com/movedPermanently -> /movedPermanently_redirected (00ms)',
+       'Redirected link (302): http://example.com/movedTemporarily -> [Missing Location header] (00ms)',
+       '2 issues, see above']));
   },
 
   checkLinksLinksToIgnore: function(test) {
@@ -418,7 +420,7 @@ exports.checkPages = {
           'invalidEntity.html?field1=value&md5=fa3e4d3dc439fdb42d86855e516a92aa&field2=value',
           'localLinks.html?crc32=abcd',
           'multipleErrors.html?crc32=F88F0D21',
-          'redirectLink.html?crc32=e4f013b5',
+          'redirectLink.html?crc32=4363890c',
           'retryWhenHeadFails.html?sha1=abcd',
           'unclosedElement.html?sha1=1D9E557D3B99507E8582E67F235D3DE6DFA3717A',
           'unclosedImg.html?sha1=9511fa1a787d021bdf3aa9538029a44209fb5c4c',
@@ -444,8 +446,8 @@ exports.checkPages = {
            'Link: http://example.com/localLinks.html?crc32=abcd (00ms)',
            'Link: http://example.com/multipleErrors.html?crc32=F88F0D21 (00ms)',
            'Hash: http://example.com/multipleErrors.html?crc32=F88F0D21',
-           'Link: http://example.com/redirectLink.html?crc32=e4f013b5 (00ms)',
-           'Hash: http://example.com/redirectLink.html?crc32=e4f013b5',
+           'Link: http://example.com/redirectLink.html?crc32=4363890c (00ms)',
+           'Hash: http://example.com/redirectLink.html?crc32=4363890c',
            'Link: http://example.com/retryWhenHeadFails.html?sha1=abcd (00ms)',
            'Link: http://example.com/unclosedElement.html?sha1=1D9E557D3B99507E8582E67F235D3DE6DFA3717A (00ms)',
            'Hash: http://example.com/unclosedElement.html?sha1=1D9E557D3B99507E8582E67F235D3DE6DFA3717A',
@@ -471,10 +473,11 @@ exports.checkPages = {
   },
 
   checkLinksMultiplePages: function(test) {
-    test.expect(10);
+    test.expect(11);
     nockFiles(['externalLink.html', 'redirectLink.html', 'ignoreLinks.html']);
     nockLinks(['link', 'link0', 'link1', 'link2']);
-    nockRedirect('redirect');
+    nockRedirect('movedPermanently', 301);
+    nockRedirect('movedTemporarily', 302);
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/externalLink.html',
                  'http://example.com/redirectLink.html',
@@ -487,7 +490,8 @@ exports.checkPages = {
       ['Page: http://example.com/externalLink.html (00ms)',
        'Link: http://example.com/link (00ms)',
        'Page: http://example.com/redirectLink.html (00ms)',
-       'Link: http://example.com/redirect (00ms)',
+       'Link: http://example.com/movedPermanently (00ms)',
+       'Link: http://example.com/movedTemporarily (00ms)',
        'Page: http://example.com/ignoreLinks.html (00ms)',
        'Link: http://example.com/link0 (00ms)',
        'Link: http://example.com/link1 (00ms)',

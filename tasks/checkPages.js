@@ -103,7 +103,11 @@ module.exports = function(grunt) {
                   }
                 }
               } else if (useGetRequest) {
-                logError('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
+                if (res.redirect && options.noRedirects) {
+                  logError('Redirected link (' + res.status + '): ' + link + ' -> ' + (res.headers.location || '[Missing Location header]') + ' (' + elapsed + 'ms)');
+                } else {
+                  logError('Bad link (' + res.status + '): ' + link + ' (' + elapsed + 'ms)');
+                }
               } else {
                 // Retry HEAD request as GET to be sure
                 testLink(link, options, true)(callback);
