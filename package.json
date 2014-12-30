@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "cheerio": "^0.18.0",
-    "crc": "3.2.1",
+    "crc-hash": "^0.1.0",
     "sax": "^0.6.1",
     "superagent": "^0.21.0"
   },

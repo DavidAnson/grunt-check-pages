@@ -15,7 +15,7 @@ module.exports = function(grunt) {
   var request = require('superagent');
   var cheerio = require('cheerio');
   var sax = require('sax');
-  var crchash = require('./crchash');
+  var crchash = require('crc-hash');
 
   // Global variables
   var userAgent = 'grunt-check-pages/' + require('../package.json').version;
