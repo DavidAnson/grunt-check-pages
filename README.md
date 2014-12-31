@@ -242,3 +242,4 @@ This is useful for pages that alter their behavior based on the user agent. Sett
 * 0.2.0 - Support `noLocalLinks` option, rename `disallowRedirect` option to `noRedirects`, switch to [`ESLint`](http://eslint.org/), update `superagent` and `nock` dependencies.
 * 0.3.0 - Support `queryHashes` option for CRC-32/MD5/SHA-1, update `superagent` dependency.
 * 0.4.0 - Rename `onlySameDomainLinks` option to `onlySameDomain`, fix handling of redirected page links, use page order for links, update all dependencies.
+* 0.5.0 - Show location of redirected links with `noRedirects` option, switch to `crc-hash` dependency.
