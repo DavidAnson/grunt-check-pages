@@ -28,7 +28,7 @@
   },
   "dependencies": {
     "cheerio": "^0.18.0",
-    "crc-hash": "^0.1.0",
+    "crc-hash": "^0.2.0",
     "sax": "^0.6.1",
     "superagent": "^0.21.0"
   },
@@ -36,9 +36,9 @@
     "grunt": "~0.4.5",
     "grunt-contrib-nodeunit": "^0.4.1",
     "grunt-contrib-watch": "^0.6.1",
-    "grunt-eslint": "^2.1.0",
+    "grunt-eslint": "^3.0.0",
     "gruntmock": "^0.1.1",
-    "nock": "^0.51.0"
+    "nock": "^0.56.0"
   },
   "peerDependencies": {
     "grunt": "~0.4.4"

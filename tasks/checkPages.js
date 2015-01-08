@@ -44,8 +44,8 @@ module.exports = function(grunt) {
 
   // Returns true if and only if the specified link is on the list to ignore
   function isLinkIgnored(link, options) {
-    return options.linksToIgnore.some(function(isLinkIgnored) {
-      return (isLinkIgnored === link);
+    return options.linksToIgnore.some(function(linkToIgnore) {
+      return (linkToIgnore === link);
     });
   }
 
