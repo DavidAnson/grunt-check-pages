@@ -25,7 +25,7 @@ grunt.loadNpmTasks('grunt-check-pages');
 
 ### Overview
 
-An important aspect of creating a web site is to validate the structure, content, and configuration of the site's pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
+An important aspect of creating a web site is validating the structure, content, and configuration of the site's pages. The `checkPages` task provides an easy way to integrate this testing into your normal Grunt workflow.
 
 By providing a list of pages to scan, the task can:
 
@@ -65,7 +65,8 @@ grunt.initConfig({
         checkCaching: true,
         checkCompression: true,
         maxResponseTime: 200,
-        userAgent: 'custom-user-agent/1.2.3'
+        userAgent: 'custom-user-agent/1.2.3',
+        summary: true
       }
     },
     production: {
@@ -229,6 +230,15 @@ Default value: `grunt-check-pages/x.y.z`
 `userAgent` specifies the value of the HTTP [`User-Agent`](https://tools.ietf.org/html/rfc2616#section-14.43) header sent with all page/link requests.
 
 This is useful for pages that alter their behavior based on the user agent. Setting the value `null` omits the `User-Agent` header entirely.
+
+#### summary
+
+Type: `Boolean`  
+Default value: `false`
+
+Enabling the `summary` option logs a summary of each issue found after all checks have completed.
+
+This makes it easy to pick out failures when running tests against many pages.
 
 
 ## Release History

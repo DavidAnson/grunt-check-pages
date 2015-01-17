@@ -20,12 +20,12 @@ module.exports = function(grunt) {
   // Global variables
   var userAgent = 'grunt-check-pages/' + require('../package.json').version;
   var pendingCallbacks = [];
-  var issueCount = 0;
+  var issues = [];
 
-  // Logs an error and increments the error count
-  function logError(message) {
+  // Logs an error for a page
+  function logPageError(page, message) {
     grunt.log.error(message);
-    issueCount++;
+    issues.push([page, message]);
   }
 
   // Set common request headers
@@ -50,8 +50,9 @@ module.exports = function(grunt) {
   }
 
   // Returns a callback to test the specified link
-  function testLink(link, options, retryWithGet) {
+  function testLink(page, link, options, retryWithGet) {
     return function (callback) {
+      var logError = logPageError.bind(null, page);
       var start = Date.now();
       var hash = null;
       var linkHash = null;
@@ -110,7 +111,7 @@ module.exports = function(grunt) {
                 }
               } else {
                 // Retry HEAD request as GET to be sure
-                testLink(link, options, true)(callback);
+                testLink(page, link, options, true)(callback);
                 return;
               }
               callback();
@@ -130,16 +131,16 @@ module.exports = function(grunt) {
   }
 
   // Adds pending callbacks for all links matching <element attribute='*'/>
-  function addLinks($, element, attribute, base, options, index) {
-    var baseHostname = url.parse(base).hostname;
+  function addLinks($, element, attribute, page, options, index) {
+    var pageHostname = url.parse(page).hostname;
     $(element).each(function() {
       var link = $(this).attr(attribute);
       if (link) {
-        var resolvedLink = url.resolve(base, link);
-        if ((!options.onlySameDomain || (url.parse(resolvedLink).hostname === baseHostname)) &&
+        var resolvedLink = url.resolve(page, link);
+        if ((!options.onlySameDomain || (url.parse(resolvedLink).hostname === pageHostname)) &&
            !isLinkIgnored(resolvedLink, options)) {
           // Add to beginning of queue (in order) so links gets processed before the next page
-          pendingCallbacks.splice(index, 0, testLink(resolvedLink, options));
+          pendingCallbacks.splice(index, 0, testLink(page, resolvedLink, options));
           index++;
         }
       }
@@ -150,6 +151,7 @@ module.exports = function(grunt) {
   // Returns a callback to test the specified page
   function testPage(page, options) {
     return function (callback) {
+      var logError = logPageError.bind(null, page);
       var start = Date.now();
       var req = request
         .get(page)
@@ -280,6 +282,7 @@ module.exports = function(grunt) {
         userAgent = null;
       }
     }
+    options.summary = !!options.summary;
 
     // Queue callbacks for each page
     options.pageUrls.forEach(function(page) {
@@ -289,8 +292,27 @@ module.exports = function(grunt) {
     // Queue 'done' callback
     var done = this.async();
     pendingCallbacks.push(function() {
+      var issueCount = issues.length;
       if (issueCount) {
-        grunt.fail.warn(issueCount + ' issue' + (issueCount > 1 ? 's' : '') + ', see above');
+        if (options.summary) {
+          var summary = 'Summary of issues:\n';
+          var currentPage;
+          issues.forEach(function(issue) {
+            var page = issue[0];
+            var message = issue[1];
+            if (currentPage !== page) {
+              summary += ' ' + page + '\n';
+              currentPage = page;
+            }
+            summary += '  ' + message + '\n';
+          });
+          grunt.log.error(summary);
+        }
+        var warning = issueCount + ' issue' + (issueCount > 1 ? 's' : '') + ', see above.';
+        if (!options.summary) {
+          warning += ' (Set options.summary for a summary.)';
+        }
+        grunt.fail.warn(warning);
       }
       done();
     });
