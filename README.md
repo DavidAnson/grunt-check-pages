@@ -253,3 +253,4 @@ This makes it easy to pick out failures when running tests against many pages.
 * 0.3.0 - Support `queryHashes` option for CRC-32/MD5/SHA-1, update `superagent` dependency.
 * 0.4.0 - Rename `onlySameDomainLinks` option to `onlySameDomain`, fix handling of redirected page links, use page order for links, update all dependencies.
 * 0.5.0 - Show location of redirected links with `noRedirects` option, switch to `crc-hash` dependency.
+* 0.6.0 - Support `summary` option, update `crc-hash`, `grunt-eslint`, `nock` dependencies.
