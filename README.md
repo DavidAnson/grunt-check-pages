@@ -5,6 +5,7 @@
 [![npm version][npm-image]][npm-url]
 [![GitHub tag][github-tag-image]][github-tag-url]
 [![Build status][travis-image]][travis-url]
+[![Coverage][coveralls-image]][coveralls-url]
 [![License][license-image]][license-url]
 
 
@@ -267,5 +268,7 @@ This makes it easy to pick out failures when running tests against many pages.
 [github-tag-url]: https://github.com/DavidAnson/grunt-check-pages
 [travis-image]: https://img.shields.io/travis/DavidAnson/grunt-check-pages.svg
 [travis-url]: https://travis-ci.org/DavidAnson/grunt-check-pages
+[coveralls-image]: https://img.shields.io/coveralls/DavidAnson/grunt-check-pages.svg
+[coveralls-url]: https://coveralls.io/r/DavidAnson/grunt-check-pages
 [license-image]: https://img.shields.io/npm/l/grunt-check-pages.svg
 [license-url]: http://opensource.org/licenses/MIT
