@@ -2,6 +2,11 @@
 
 > Checks various aspects of a web page for correctness.
 
+[![npm version][npm-image]][npm-url]
+[![GitHub tag][github-tag-image]][github-tag-url]
+[![Build status][travis-image]][travis-url]
+[![License][license-image]][license-url]
+
 
 ## Getting Started
 
@@ -254,3 +259,13 @@ This makes it easy to pick out failures when running tests against many pages.
 * 0.4.0 - Rename `onlySameDomainLinks` option to `onlySameDomain`, fix handling of redirected page links, use page order for links, update all dependencies.
 * 0.5.0 - Show location of redirected links with `noRedirects` option, switch to `crc-hash` dependency.
 * 0.6.0 - Support `summary` option, update `crc-hash`, `grunt-eslint`, `nock` dependencies.
+
+
+[npm-image]: https://img.shields.io/npm/v/grunt-check-pages.svg
+[npm-url]: https://npmjs.org/package/grunt-check-pages
+[github-tag-image]: https://img.shields.io/github/tag/DavidAnson/grunt-check-pages.svg
+[github-tag-url]: https://github.com/DavidAnson/grunt-check-pages
+[travis-image]: https://img.shields.io/travis/DavidAnson/grunt-check-pages.svg
+[travis-url]: https://travis-ci.org/DavidAnson/grunt-check-pages
+[license-image]: https://img.shields.io/npm/l/grunt-check-pages.svg
+[license-url]: http://opensource.org/licenses/MIT
