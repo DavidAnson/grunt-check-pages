@@ -260,6 +260,7 @@ This makes it easy to pick out failures when running tests against many pages.
 * 0.4.0 - Rename `onlySameDomainLinks` option to `onlySameDomain`, fix handling of redirected page links, use page order for links, update all dependencies.
 * 0.5.0 - Show location of redirected links with `noRedirects` option, switch to `crc-hash` dependency.
 * 0.6.0 - Support `summary` option, update `crc-hash`, `grunt-eslint`, `nock` dependencies.
+* 0.6.1 - Add badges for automated build and coverage info to README (along with npm, GitHub, and license).
 
 
 [npm-image]: https://img.shields.io/npm/v/grunt-check-pages.svg
