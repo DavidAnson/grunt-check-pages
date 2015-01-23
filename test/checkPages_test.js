@@ -46,15 +46,20 @@ function nockLinks(links, base) {
       .reply(200);
   });
 }
-function nockRedirect(link, status, noLocation) {
+function nockRedirect(link, status, noRedirects, noLocation) {
   var slashLink = '/' + link;
-  nock('http://example.com')
+  var scope = nock('http://example.com')
     .head(slashLink)
-    .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' })
-    .get(slashLink)
-    .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' })
-    .get(slashLink + '_redirected')
-    .reply(200);
+    .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' });
+    if (noRedirects) {
+      scope
+        .get(slashLink)
+        .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' });
+    } else {
+      scope
+        .head(slashLink + '_redirected')
+        .reply(200);
+    }
 }
 
 exports.checkPages = {
@@ -338,8 +343,8 @@ exports.checkPages = {
   checkLinksNoRedirects: function(test) {
     test.expect(7);
     nockFiles(['redirectLink.html']);
-    nockRedirect('movedPermanently', 301);
-    nockRedirect('movedTemporarily', 302, true);
+    nockRedirect('movedPermanently', 301, true);
+    nockRedirect('movedTemporarily', 302, true, true);
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/redirectLink.html'],
       checkLinks: true,

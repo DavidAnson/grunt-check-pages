@@ -1,11 +1,3 @@
-/*
- * grunt-check-pages
- * https://github.com/DavidAnson/grunt-check-pages
- *
- * Copyright (c) 2014 David Anson
- * Licensed under the MIT license.
- */
-
 'use strict';
 
 module.exports = function(grunt) {
