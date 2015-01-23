@@ -477,6 +477,18 @@ exports.checkPages = {
     });
   },
 
+  checkLinksInvalidProtocol: function(test) {
+    test.expect(3);
+    nockFiles(['invalidProtocol.html']);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/invalidProtocol.html'],
+      checkLinks: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/invalidProtocol.html (00ms)'],
+      []));
+  },
+
   checkLinksMultiplePages: function(test) {
     test.expect(11);
     nockFiles(['externalLink.html', 'redirectLink.html', 'ignoreLinks.html']);

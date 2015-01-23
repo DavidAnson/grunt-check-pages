@@ -118,8 +118,10 @@ module.exports = function(grunt) {
       var link = $(this).attr(attribute);
       if (link) {
         var resolvedLink = url.resolve(page, link);
-        if ((!options.onlySameDomain || (url.parse(resolvedLink).hostname === pageHostname)) &&
-           !isLinkIgnored(resolvedLink, options)) {
+        var parsedLink = url.parse(resolvedLink);
+        if (((parsedLink.protocol === 'http:') || (parsedLink.protocol === 'https:')) &&
+            (!options.onlySameDomain || (parsedLink.hostname === pageHostname)) &&
+            !isLinkIgnored(resolvedLink, options)) {
           // Add to beginning of queue (in order) so links gets processed before the next page
           pendingCallbacks.splice(index, 0, testLink(page, resolvedLink, options));
           index++;
