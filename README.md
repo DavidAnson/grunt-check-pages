@@ -253,7 +253,7 @@ This makes it easy to pick out failures when running tests against many pages.
 * 0.1.1 - Tweak README for better formatting.
 * 0.1.2 - Support page-only mode (no link or XHTML checks), show response time for requests.
 * 0.1.3 - Support `maxResponseTime` option, buffer all page responses, add "no-cache" header to requests.
-* 0.1.4 - Support `checkCaching` and `checkCompression` options, improve error handling, use [`gruntMock`](https://www.npmjs.org/package/gruntmock).
+* 0.1.4 - Support `checkCaching` and `checkCompression` options, improve error handling, use [`gruntMock`](https://www.npmjs.com/package/gruntmock).
 * 0.1.5 - Support `userAgent` option, weak entity tags, update `nock` dependency.
 * 0.2.0 - Support `noLocalLinks` option, rename `disallowRedirect` option to `noRedirects`, switch to [`ESLint`](http://eslint.org/), update `superagent` and `nock` dependencies.
 * 0.3.0 - Support `queryHashes` option for CRC-32/MD5/SHA-1, update `superagent` dependency.
@@ -261,10 +261,11 @@ This makes it easy to pick out failures when running tests against many pages.
 * 0.5.0 - Show location of redirected links with `noRedirects` option, switch to `crc-hash` dependency.
 * 0.6.0 - Support `summary` option, update `crc-hash`, `grunt-eslint`, `nock` dependencies.
 * 0.6.1 - Add badges for automated build and coverage info to README (along with npm, GitHub, and license).
+* 0.6.2 - Switch from `superagent` to `request`, update `grunt-eslint` and `nock` dependencies.
 
 
 [npm-image]: https://img.shields.io/npm/v/grunt-check-pages.svg
-[npm-url]: https://npmjs.org/package/grunt-check-pages
+[npm-url]: https://www.npmjs.com/package/grunt-check-pages
 [github-tag-image]: https://img.shields.io/github/tag/DavidAnson/grunt-check-pages.svg
 [github-tag-url]: https://github.com/DavidAnson/grunt-check-pages
 [travis-image]: https://img.shields.io/travis/DavidAnson/grunt-check-pages.svg
