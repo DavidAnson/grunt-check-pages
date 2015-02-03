@@ -11,11 +11,13 @@ var checkPages = require('../tasks/checkPages.js');
 nock.disableNetConnect();
 
 // Verify a task's output
-function testOutput(test, ok, error) {
+function testOutput(test, ok, error, exception) {
   return function(err, mock) {
     test.equal(mock.logOk.length, ok.length, 'Wrong logOk count');
     test.equal(mock.logError.length, error.length, 'Wrong logError count');
-    if (err) {
+    if (exception) {
+      test.equal(err.message, exception, 'Wrong exception text');
+    } else if (err) {
       test.equal(err.message, error.slice(-1), 'Wrong exception text');
     }
     while (mock.logOk.length && ok.length) {
@@ -67,51 +69,57 @@ exports.checkPages = {
   // Task parameters
 
   filesPresent: function(test) {
-    test.expect(4);
+    test.expect(3);
     var mock = gruntMock.create({ files: [ { src: ['file'] } ] });
     mock.invoke(checkPages, testOutput(test,
       [],
-      ['checkPages task does not use files; remove the files parameter']));
+      [],
+      'checkPages task does not use files; remove the files parameter'));
   },
 
   pageUrlsMissing: function(test) {
-    test.expect(4);
+    test.expect(3);
     var mock = gruntMock.create();
     mock.invoke(checkPages, testOutput(test,
       [],
-      ['pageUrls option is not present; it should be an array of URLs']));
+      [],
+      'pageUrls option is missing or invalid; it should be an array of URLs'));
   },
 
   pageUrlsWrongType: function(test) {
-    test.expect(4);
+    test.expect(3);
     var mock = gruntMock.create({ options: { pageUrls: 'string' } });
     mock.invoke(checkPages, testOutput(test,
       [],
-      ['pageUrls option is invalid; it should be an array of URLs']));
+      [],
+      'pageUrls option is missing or invalid; it should be an array of URLs'));
   },
 
   linksToIgnoreWrongType: function(test) {
-    test.expect(4);
+    test.expect(3);
     var mock = gruntMock.create({ options: { pageUrls: [], linksToIgnore: 'string' } });
     mock.invoke(checkPages, testOutput(test,
       [],
-      ['linksToIgnore option is invalid; it should be an array']));
+      [],
+      'linksToIgnore option is invalid; it should be an array'));
   },
 
   maxResponseTimeWrongType: function(test) {
-    test.expect(4);
+    test.expect(3);
     var mock = gruntMock.create({ options: { pageUrls: [], maxResponseTime: 'string' } });
     mock.invoke(checkPages, testOutput(test,
       [],
-      ['maxResponseTime option is invalid; it should be a positive number']));
+      [],
+      'maxResponseTime option is invalid; it should be a positive number'));
   },
 
   userAgentWrongType: function(test) {
-    test.expect(4);
+    test.expect(3);
     var mock = gruntMock.create({ options: { pageUrls: [], userAgent: 5 } });
     mock.invoke(checkPages, testOutput(test,
       [],
-      ['userAgent option is invalid; it should be a string or null']));
+      [],
+      'userAgent option is invalid; it should be a string or null'));
   },
 
   // Basic functionality
@@ -901,13 +909,13 @@ exports.checkPages = {
   requestHeaders: function(test) {
     test.expect(4);
     nock('http://example.com')
-      .matchHeader('User-Agent', 'grunt-check-pages/0.6.2')
+      .matchHeader('User-Agent', 'grunt-check-pages/0.7.0')
       .matchHeader('Cache-Control', 'no-cache')
       .matchHeader('Pragma', 'no-cache')
       .get('/page')
       .reply(200, '<html><body><a href="link">link</a></body></html>');
     nock('http://example.com')
-      .matchHeader('User-Agent', 'grunt-check-pages/0.6.2')
+      .matchHeader('User-Agent', 'grunt-check-pages/0.7.0')
       .matchHeader('Cache-Control', 'no-cache')
       .matchHeader('Pragma', 'no-cache')
       .head('/link')

@@ -1,6 +1,6 @@
 # grunt-check-pages
 
-> Checks various aspects of a web page for correctness.
+> Grunt task that checks various aspects of a web page for correctness.
 
 [![npm version][npm-image]][npm-url]
 [![GitHub tag][github-tag-image]][github-tag-url]
@@ -262,6 +262,7 @@ This makes it easy to pick out failures when running tests against many pages.
 * 0.6.0 - Support `summary` option, update `crc-hash`, `grunt-eslint`, `nock` dependencies.
 * 0.6.1 - Add badges for automated build and coverage info to README (along with npm, GitHub, and license).
 * 0.6.2 - Switch from `superagent` to `request`, update `grunt-eslint` and `nock` dependencies.
+* 0.7.0 - Move task implementation into reusable `check-pages` package.
 
 
 [npm-image]: https://img.shields.io/npm/v/grunt-check-pages.svg
