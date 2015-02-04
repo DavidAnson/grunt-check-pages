@@ -163,7 +163,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       [],
       ['Bad page (404): http://example.com/notFound (00ms)',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   pageUrlsMultiple: function(test) {
@@ -184,7 +184,7 @@ exports.checkPages = {
        'Page: http://example.com/validPage.html (00ms)'],
       ['Bad page (404): http://example.com/notFound (00ms)',
        'Bad page (500): http://example.com/serverError (00ms)',
-       '2 issues, see above. (Set options.summary for a summary.)']));
+       '2 issues. (Set options.summary for a summary.)']));
   },
 
   // checkLinks functionality
@@ -314,7 +314,7 @@ exports.checkPages = {
        'Link: http://example.com/link2 (00ms)'],
       ['Bad link (404): http://example.com/broken0 (00ms)',
        'Bad link (500): http://example.com/broken1 (00ms)',
-       '2 issues, see above. (Set options.summary for a summary.)']));
+       '2 issues. (Set options.summary for a summary.)']));
   },
 
   checkLinksRetryWhenHeadFails: function(test) {
@@ -362,7 +362,7 @@ exports.checkPages = {
       ['Page: http://example.com/redirectLink.html (00ms)'],
       ['Redirected link (301): http://example.com/movedPermanently -> /movedPermanently_redirected (00ms)',
        'Redirected link (302): http://example.com/movedTemporarily -> [Missing Location header] (00ms)',
-       '2 issues, see above. (Set options.summary for a summary.)']));
+       '2 issues. (Set options.summary for a summary.)']));
   },
 
   checkLinksLinksToIgnore: function(test) {
@@ -413,7 +413,7 @@ exports.checkPages = {
        'Link error (Nock: Not allow net connect for "ff02:80"): http://[ff02::1]/ (00ms)',
        'Local link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/',
        'Link error (Nock: Not allow net connect for "0000:80"): http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
-       '6 issues, see above. (Set options.summary for a summary.)']));
+       '6 issues. (Set options.summary for a summary.)']));
   },
 
   checkLinksQueryHashes: function(test) {
@@ -480,7 +480,7 @@ exports.checkPages = {
           ['Hash error (7f5a1ac1e6dc59679f36482973efc871): http://example.com/brokenLinks.html?md5=abcd',
            'Hash error (73fb7b7a): http://example.com/localLinks.html?crc32=abcd',
            'Hash error (1353361bfade29f3684fe17c8b388dadbc49cb6d): http://example.com/retryWhenHeadFails.html?sha1=abcd',
-           '3 issues, see above. (Set options.summary for a summary.)']));
+           '3 issues. (Set options.summary for a summary.)']));
       }
     });
   },
@@ -548,7 +548,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/unclosedElement.html (00ms)'],
       ['Unexpected close tag, Line: 5, Column: 7, Char: >',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   checkXhtmlUnclosedImg: function(test) {
@@ -561,7 +561,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/unclosedImg.html (00ms)'],
       ['Unexpected close tag, Line: 4, Column: 7, Char: >',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   checkXhtmlInvalidEntity: function(test) {
@@ -574,7 +574,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/invalidEntity.html (00ms)'],
       ['Invalid character entity, Line: 3, Column: 21, Char: ;',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   checkXhtmlMultipleErrors: function(test) {
@@ -588,7 +588,7 @@ exports.checkPages = {
       ['Page: http://example.com/multipleErrors.html (00ms)'],
       ['Invalid character entity, Line: 4, Column: 23, Char: ;',
        'Unexpected close tag, Line: 5, Column: 6, Char: >',
-       '2 issues, see above. (Set options.summary for a summary.)']));
+       '2 issues. (Set options.summary for a summary.)']));
   },
 
   // checkCaching functionality
@@ -664,7 +664,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/validPage.html (00ms)'],
       ['Missing Cache-Control header in response',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   checkCachingInvalidCacheControl: function(test) {
@@ -680,7 +680,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/validPage.html (00ms)'],
       ['Invalid Cache-Control header in response: invalid',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   checkCachingMissingEtag: function(test) {
@@ -695,7 +695,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/validPage.html (00ms)'],
       ['Missing ETag header in response',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   checkCachingInvalidEtag: function(test) {
@@ -711,7 +711,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/validPage.html (00ms)'],
       ['Invalid ETag header in response: invalid',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   // checkCompression functionality
@@ -749,7 +749,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/validPage.html (00ms)'],
       ['Missing Content-Encoding header in response',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   checkCompressionInvalidContentEncoding: function(test) {
@@ -764,7 +764,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/validPage.html (00ms)'],
       ['Invalid Content-Encoding header in response: invalid',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   // maxResponseTime functionality
@@ -796,7 +796,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/page (00ms)'],
       ['Page response took more than 100ms to complete',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   // userAgent functionality
@@ -901,7 +901,7 @@ exports.checkPages = {
          ' http://example.com/brokenLinks.html\n' +
          '  Bad link (404): http://example.com/broken0 (00ms)\n' +
          '  Bad link (500): http://example.com/broken1 (00ms)\n',
-       '5 issues, see above.']));
+       '5 issues.']));
   },
 
   // Nock configuration
@@ -945,7 +945,7 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       [],
       ['Page error (connect ECONNREFUSED): http://localhost:9999/notListening (00ms)',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   },
 
   linkConnectionError: function(test) {
@@ -960,6 +960,6 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/page (00ms)'],
       ['Link error (connect ECONNREFUSED): http://localhost:9999/notListening (00ms)',
-       '1 issue, see above. (Set options.summary for a summary.)']));
+       '1 issue. (Set options.summary for a summary.)']));
   }
 };

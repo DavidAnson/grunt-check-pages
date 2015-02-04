@@ -20,9 +20,8 @@ module.exports = function(grunt) {
 
     // Configure the host object
     var host = {
-      logOk: grunt.log.ok,
-      logError: grunt.log.error,
-      fail: grunt.fail.warn
+      log: grunt.log.ok,
+      error: grunt.log.error
     };
 
     // Customize the options object
@@ -32,6 +31,12 @@ module.exports = function(grunt) {
     }
 
     // Start checking
-    checkPages(host, options, this.async());
+    var done = this.async();
+    checkPages(host, options, function(err) {
+      if (err) {
+        grunt.fail.warn(err.message);
+      }
+      done();
+    });
   });
 };
