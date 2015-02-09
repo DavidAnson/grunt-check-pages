@@ -24,7 +24,7 @@ function testOutput(test, ok, error, exception) {
       test.equal(mock.logOk.shift().replace(/\(\d+ms\)/g, '(00ms)'), ok.shift(), 'Wrong logOk item');
     }
     while (mock.logError.length && error.length) {
-      test.equal(mock.logError.shift().replace(/\(\d+ms\)/g, '(00ms)'), error.shift(), 'Wrong logError item');
+      test.equal(mock.logError.shift().replace(/\(\d+ms\)/g, '(00ms)').replace(/ECONNREFUSED \d+\.\d+\.\d+\.\d+:\d+/g, 'ECONNREFUSED'), error.shift(), 'Wrong logError item');
     }
     test.done();
   };
