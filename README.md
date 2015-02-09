@@ -11,7 +11,7 @@
 
 ## Getting Started
 
-This plugin requires Grunt `~0.4.4`
+This plugin requires Grunt `~0.4.4`.
 
 If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
@@ -24,6 +24,8 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 ```js
 grunt.loadNpmTasks('grunt-check-pages');
 ```
+
+(*For similar functionality without a Grunt dependency, please see the [`check-pages`](https://www.npmjs.com/package/check-pages) package.*)
 
 
 ## The "checkPages" task
