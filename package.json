@@ -23,7 +23,7 @@
     "test-cover": "istanbul cover node_modules/nodeunit/bin/nodeunit"
   },
   "dependencies": {
-    "check-pages": "^0.7.0"
+    "check-pages": "^0.7.1"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
