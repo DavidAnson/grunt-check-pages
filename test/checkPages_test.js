@@ -53,15 +53,15 @@ function nockRedirect(link, status, noRedirects, noLocation) {
   var scope = nock('http://example.com')
     .head(slashLink)
     .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' });
-    if (noRedirects) {
-      scope
-        .get(slashLink)
-        .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' });
-    } else {
-      scope
-        .head(slashLink + '_redirected')
-        .reply(200);
-    }
+  if (noRedirects) {
+    scope
+      .get(slashLink)
+      .reply(status, '', noLocation ? null : { 'Location': slashLink + '_redirected' });
+  } else {
+    scope
+      .head(slashLink + '_redirected')
+      .reply(200);
+  }
 }
 
 exports.checkPages = {
