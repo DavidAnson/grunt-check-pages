@@ -294,6 +294,27 @@ exports.checkPages = {
       []));
   },
 
+  checkLinksFragmentIdentifier: function(test) {
+    test.expect(9);
+    nockFiles(['fragmentIdentifier.html']);
+    nockLinks([
+      'fragmentIdentifier.html', 'fragmentIdentifier.html?name=value',
+      'link', 'link?name=value']);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/fragmentIdentifier.html'],
+      checkLinks: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/fragmentIdentifier.html (00ms)',
+       'Link: http://example.com/fragmentIdentifier.html# (00ms)',
+       'Visited link: http://example.com/fragmentIdentifier.html#fragment',
+       'Link: http://example.com/fragmentIdentifier.html?name=value#fragment (00ms)',
+       'Link: http://example.com/link#fragment (00ms)',
+       'Visited link: http://example.com/link#',
+       'Link: http://example.com/link?name=value#fragment (00ms)'],
+      []));
+  },
+
   checkLinksInvalid: function(test) {
     test.expect(10);
     nockFiles(['brokenLinks.html']);
@@ -357,7 +378,7 @@ exports.checkPages = {
       []));
   },
 
-  checkLinksonlySameDomain: function(test) {
+  checkLinksOnlySameDomain: function(test) {
     test.expect(4);
     nockFiles(['externalLink.html']);
     nockLinks(['link']);
@@ -430,14 +451,37 @@ exports.checkPages = {
        'Link: http://[::1]/ (00ms)'],
        // 'Link: http://[ff02::1]/ (00ms)',
        // 'Link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
-      [
-       'Local link: http://localhost/',
+      ['Local link: http://localhost/',
        'Local link: http://127.0.0.1/',
        'Local link: http://[::1]/',
        'Link error (Nock: Not allow net connect for "ff02:80/"): http://[ff02::1]/ (00ms)',
        'Local link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/',
        'Link error (Nock: Not allow net connect for "0000:80/"): http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
        '6 issues. (Set options.summary for a summary.)']));
+  },
+
+  checkLinksNoEmptyFragments: function(test) {
+    test.expect(13);
+    nockFiles(['fragmentIdentifier.html']);
+    nockLinks([
+      'fragmentIdentifier.html', 'fragmentIdentifier.html?name=value',
+      'link', 'link?name=value']);
+    var mock = gruntMock.create({ options: {
+      pageUrls: ['http://example.com/fragmentIdentifier.html'],
+      checkLinks: true,
+      noEmptyFragments: true
+    }});
+    mock.invoke(checkPages, testOutput(test,
+      ['Page: http://example.com/fragmentIdentifier.html (00ms)',
+       'Link: http://example.com/fragmentIdentifier.html# (00ms)',
+       'Visited link: http://example.com/fragmentIdentifier.html#fragment',
+       'Link: http://example.com/fragmentIdentifier.html?name=value#fragment (00ms)',
+       'Link: http://example.com/link#fragment (00ms)',
+       'Visited link: http://example.com/link#',
+       'Link: http://example.com/link?name=value#fragment (00ms)'],
+      ['Empty fragment: http://example.com/fragmentIdentifier.html#',
+       'Empty fragment: http://example.com/link#',
+       '2 issues. (Set options.summary for a summary.)']));
   },
 
   checkLinksQueryHashes: function(test) {
@@ -522,15 +566,23 @@ exports.checkPages = {
   },
 
   checkLinksMultiplePages: function(test) {
-    test.expect(11);
-    nockFiles(['externalLink.html', 'redirectLink.html', 'ignoreLinks.html']);
-    nockLinks(['link', 'link0', 'link1', 'link2']);
+    test.expect(30);
+    nockFiles([
+      'externalLink.html', 'fragmentIdentifier.html', 'redirectLink.html',
+      'fragmentIdentifier.html', 'ignoreLinks.html', 'externalLink.html',
+      'redirectLink.html']);
+    nockLinks(['link', 'link0', 'link1', 'link2', 'fragmentIdentifier.html',
+      'fragmentIdentifier.html?name=value', 'link?name=value']);
     nockRedirect('movedPermanently', 301);
     nockRedirect('movedTemporarily', 302);
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/externalLink.html',
+                 'http://example.com/fragmentIdentifier.html',
                  'http://example.com/redirectLink.html',
-                 'http://example.com/ignoreLinks.html'],
+                 'http://example.com/fragmentIdentifier.html',
+                 'http://example.com/ignoreLinks.html',
+                 'http://example.com/externalLink.html',
+                 'http://example.com/redirectLink.html'],
       checkLinks: true,
       onlySameDomain: true,
       linksToIgnore: ['http://example.com/ignore0', 'http://example.com/ignore1']
@@ -538,13 +590,32 @@ exports.checkPages = {
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/externalLink.html (00ms)',
        'Link: http://example.com/link (00ms)',
+       'Page: http://example.com/fragmentIdentifier.html (00ms)',
+       'Link: http://example.com/fragmentIdentifier.html# (00ms)',
+       'Visited link: http://example.com/fragmentIdentifier.html#fragment',
+       'Link: http://example.com/fragmentIdentifier.html?name=value#fragment (00ms)',
+       'Visited link: http://example.com/link#fragment',
+       'Visited link: http://example.com/link#',
+       'Link: http://example.com/link?name=value#fragment (00ms)',
        'Page: http://example.com/redirectLink.html (00ms)',
        'Link: http://example.com/movedPermanently (00ms)',
        'Link: http://example.com/movedTemporarily (00ms)',
+       'Page: http://example.com/fragmentIdentifier.html (00ms)',
+       'Visited link: http://example.com/fragmentIdentifier.html#',
+       'Visited link: http://example.com/fragmentIdentifier.html#fragment',
+       'Visited link: http://example.com/fragmentIdentifier.html?name=value#fragment',
+       'Visited link: http://example.com/link#fragment',
+       'Visited link: http://example.com/link#',
+       'Visited link: http://example.com/link?name=value#fragment',
        'Page: http://example.com/ignoreLinks.html (00ms)',
        'Link: http://example.com/link0 (00ms)',
        'Link: http://example.com/link1 (00ms)',
-       'Link: http://example.com/link2 (00ms)'],
+       'Link: http://example.com/link2 (00ms)',
+       'Page: http://example.com/externalLink.html (00ms)',
+       'Visited link: http://example.com/link',
+       'Page: http://example.com/redirectLink.html (00ms)',
+       'Visited link: http://example.com/movedPermanently',
+       'Visited link: http://example.com/movedTemporarily'],
       []));
   },
 

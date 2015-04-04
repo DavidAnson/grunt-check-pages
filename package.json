@@ -3,10 +3,7 @@
   "description": "Grunt task that checks various aspects of a web page for correctness.",
   "version": "0.7.1",
   "homepage": "https://github.com/DavidAnson/grunt-check-pages",
-  "author": {
-    "name": "David Anson",
-    "url": "http://dlaa.me/"
-  },
+  "author": "David Anson (http://dlaa.me/)",
   "repository": {
     "type": "git",
     "url": "https://github.com/DavidAnson/grunt-check-pages.git"
@@ -23,7 +20,7 @@
     "test-cover": "istanbul cover node_modules/nodeunit/bin/nodeunit"
   },
   "dependencies": {
-    "check-pages": "^0.7.1"
+    "check-pages": "^0.8.0"
   },
   "devDependencies": {
     "grunt": "~0.4.5",
