@@ -277,6 +277,7 @@ This makes it easy to pick out failures when running tests against many pages.
 * 0.6.2 - Switch from `superagent` to `request`, update `grunt-eslint` and `nock` dependencies.
 * 0.7.0 - Move task implementation into reusable `check-pages` package.
 * 0.7.1 - Fix misreporting of "Bad link" for redirected links when noRedirects enabled.
+* 0.8.0 - Suppress redundant link checks, support `noEmptyFragments` option, update dependencies.
 
 
 [npm-image]: https://img.shields.io/npm/v/grunt-check-pages.svg
