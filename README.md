@@ -102,9 +102,9 @@ Type: `Array` of `String`
 Default value: `undefined`  
 *Required*
 
-`pageUrls` specifies a list of URLs for web pages the task will check.
+`pageUrls` specifies a list of URLs for web pages the task will check. The list can be empty, but must be present.
 
-URLs must be absolute and can point to local or remote content. The `pageUrls` array can be empty, but must be present.
+URLs can point to local or remote content via the `http`, `https`, and `file` protocols. `http` and `https` URLs must be absolute; `file` URLs can be relative. Some features (for example, HTTP header checks) are not available with the `file` protocol.
 
 To store the list outside `Gruntfile.js`, read the array from a JSON file instead: `pageUrls: grunt.file.readJSON('pageUrls.json')`.
 
