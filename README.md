@@ -278,15 +278,16 @@ This makes it easy to pick out failures when running tests against many pages.
 * 0.7.0 - Move task implementation into reusable `check-pages` package.
 * 0.7.1 - Fix misreporting of "Bad link" for redirected links when noRedirects enabled.
 * 0.8.0 - Suppress redundant link checks, support `noEmptyFragments` option, update dependencies.
+* 0.9.0 - Add support for checking local content via the 'file:' protocol, update dependencies.
 
 
 [npm-image]: https://img.shields.io/npm/v/grunt-check-pages.svg
 [npm-url]: https://www.npmjs.com/package/grunt-check-pages
 [github-tag-image]: https://img.shields.io/github/tag/DavidAnson/grunt-check-pages.svg
 [github-tag-url]: https://github.com/DavidAnson/grunt-check-pages
-[travis-image]: https://img.shields.io/travis/DavidAnson/grunt-check-pages.svg
+[travis-image]: https://img.shields.io/travis/DavidAnson/grunt-check-pages/master.svg
 [travis-url]: https://travis-ci.org/DavidAnson/grunt-check-pages
-[coveralls-image]: https://img.shields.io/coveralls/DavidAnson/grunt-check-pages.svg
+[coveralls-image]: https://img.shields.io/coveralls/DavidAnson/grunt-check-pages/master.svg
 [coveralls-url]: https://coveralls.io/r/DavidAnson/grunt-check-pages
 [license-image]: https://img.shields.io/npm/l/grunt-check-pages.svg
 [license-url]: http://opensource.org/licenses/MIT
