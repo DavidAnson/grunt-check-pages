@@ -27,8 +27,8 @@ function testOutput(test, ok, error, exception) {
       test.equal(
         mock.logError.shift()
           .replace(/\(\d+ms\)/g, '(00ms)')
-          .replace(/ECONNREFUSED \d+\.\d+\.\d+\.\d+:\d+/g, 'ECONNREFUSED')
-          .replace(/ENOENT, open \'[^']*\'/g, 'ENOENT'),
+          .replace(/\([^\)]*ECONNREFUSED[^\)]*\)/g, '(ECONNREFUSED)')
+          .replace(/\([^\)]*ENOENT[^\)]*\)/g, '(ENOENT)'),
         error.shift(),
         'Wrong logError item');
     }
@@ -1045,7 +1045,7 @@ exports.checkPages = {
       pageUrls: ['http://localhost:9999/notListening']}});
     mock.invoke(checkPages, testOutput(test,
       [],
-      ['Page error (connect ECONNREFUSED): http://localhost:9999/notListening (00ms)',
+      ['Page error (ECONNREFUSED): http://localhost:9999/notListening (00ms)',
        '1 issue. (Set options.summary for a summary.)']));
   },
 
@@ -1060,7 +1060,7 @@ exports.checkPages = {
     }});
     mock.invoke(checkPages, testOutput(test,
       ['Page: http://example.com/page (00ms)'],
-      ['Link error (connect ECONNREFUSED): http://localhost:9999/notListening (00ms)',
+      ['Link error (ECONNREFUSED): http://localhost:9999/notListening (00ms)',
        '1 issue. (Set options.summary for a summary.)']));
   },
 
