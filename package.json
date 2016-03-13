@@ -29,7 +29,7 @@
     "grunt-eslint": "^14.0.0",
     "gruntmock": "^0.2.0",
     "istanbul": "^0.3.14",
-    "nock": "^2.3.0",
+    "nock": "2.16.0",
     "nodeunit": "^0.9.1"
   },
   "peerDependencies": {
