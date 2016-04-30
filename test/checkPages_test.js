@@ -76,7 +76,7 @@ exports.checkPages = {
 
   filesPresent: function(test) {
     test.expect(3);
-    var mock = gruntMock.create({ files: [ { src: ['file'] } ] });
+    var mock = gruntMock.create({ files: [{ src: ['file'] }] });
     mock.invoke(checkPages, testOutput(test,
       [],
       [],
@@ -94,7 +94,7 @@ exports.checkPages = {
 
   pageUrlsWrongType: function(test) {
     test.expect(3);
-    var mock = gruntMock.create({ options: { pageUrls: 'string' } });
+    var mock = gruntMock.create({ options: { pageUrls: 'string' }});
     mock.invoke(checkPages, testOutput(test,
       [],
       [],
@@ -103,7 +103,7 @@ exports.checkPages = {
 
   linksToIgnoreWrongType: function(test) {
     test.expect(3);
-    var mock = gruntMock.create({ options: { pageUrls: [], linksToIgnore: 'string' } });
+    var mock = gruntMock.create({ options: { pageUrls: [], linksToIgnore: 'string' }});
     mock.invoke(checkPages, testOutput(test,
       [],
       [],
@@ -112,7 +112,7 @@ exports.checkPages = {
 
   maxResponseTimeWrongType: function(test) {
     test.expect(3);
-    var mock = gruntMock.create({ options: { pageUrls: [], maxResponseTime: 'string' } });
+    var mock = gruntMock.create({ options: { pageUrls: [], maxResponseTime: 'string' }});
     mock.invoke(checkPages, testOutput(test,
       [],
       [],
@@ -121,7 +121,7 @@ exports.checkPages = {
 
   userAgentWrongType: function(test) {
     test.expect(3);
-    var mock = gruntMock.create({ options: { pageUrls: [], userAgent: 5 } });
+    var mock = gruntMock.create({ options: { pageUrls: [], userAgent: 5 }});
     mock.invoke(checkPages, testOutput(test,
       [],
       [],
@@ -440,9 +440,9 @@ exports.checkPages = {
     nock('http://example.com').head('/').reply(200);
     nock('http://127.0.0.1').head('/').reply(200);
     nock('http://169.254.1.1').head('/').reply(200);
-    nock('http://localhost').head('/').reply(200); // [::1]
-    // nock('http://[ff02::1]').head('/').reply(200); // IPV6 unsupported by nock?
-    // nock('http://[0000:0000:0000:0000:0000:0000:0000:0001]').head('/').reply(200);
+    nock('http://[::1]:80').head('/').reply(200);
+    nock('http://[ff02::1]:80').head('/').reply(200);
+    nock('http://[::1]:80').head('/').reply(200);
     var mock = gruntMock.create({ options: {
       pageUrls: ['http://example.com/localLinks.html'],
       checkLinks: true,
@@ -454,16 +454,14 @@ exports.checkPages = {
        'Link: http://example.com/ (00ms)',
        'Link: http://127.0.0.1/ (00ms)',
        'Link: http://169.254.1.1/ (00ms)',
-       'Link: http://[::1]/ (00ms)'],
-       // 'Link: http://[ff02::1]/ (00ms)',
-       // 'Link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
+       'Link: http://[::1]/ (00ms)',
+       'Link: http://[ff02::1]/ (00ms)',
+       'Link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)'],
       ['Local link: http://localhost/',
        'Local link: http://127.0.0.1/',
        'Local link: http://[::1]/',
-       'Link error (Nock: Not allow net connect for "ff02:80/"): http://[ff02::1]/ (00ms)',
        'Local link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/',
-       'Link error (Nock: Not allow net connect for "0000:80/"): http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
-       '6 issues. (Set options.summary for a summary.)']));
+       '4 issues. (Set options.summary for a summary.)']));
   },
 
   checkLinksNoEmptyFragments: function(test) {
@@ -1042,7 +1040,8 @@ exports.checkPages = {
   pageConnectionError: function(test) {
     test.expect(5);
     var mock = gruntMock.create({ options: {
-      pageUrls: ['http://localhost:9999/notListening']}});
+      pageUrls: ['http://localhost:9999/notListening']
+    }});
     mock.invoke(checkPages, testOutput(test,
       [],
       ['Page error (ECONNREFUSED): http://localhost:9999/notListening (00ms)',
@@ -1166,6 +1165,9 @@ exports.checkPages = {
     nock('http://127.0.0.1').head('/').reply(200);
     nock('http://169.254.1.1').head('/').reply(200);
     nock('http://localhost').head('/').reply(200);
+    nock('http://[::1]:80').head('/').reply(200);
+    nock('http://[ff02::1]:80').head('/').reply(200);
+    nock('http://[::1]:80').head('/').reply(200);
     var mock = gruntMock.create({ options: {
       pageUrls: ['test/localLinks.html'],
       checkLinks: true,
@@ -1177,14 +1179,14 @@ exports.checkPages = {
        'Link: http://example.com/ (00ms)',
        'Link: http://127.0.0.1/ (00ms)',
        'Link: http://169.254.1.1/ (00ms)',
-       'Link: http://[::1]/ (00ms)'],
+       'Link: http://[::1]/ (00ms)',
+       'Link: http://[ff02::1]/ (00ms)',
+       'Link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)'],
       ['Local link: http://localhost/',
        'Local link: http://127.0.0.1/',
        'Local link: http://[::1]/',
-       'Link error (Nock: Not allow net connect for "ff02:80/"): http://[ff02::1]/ (00ms)',
        'Local link: http://[0000:0000:0000:0000:0000:0000:0000:0001]/',
-       'Link error (Nock: Not allow net connect for "0000:80/"): http://[0000:0000:0000:0000:0000:0000:0000:0001]/ (00ms)',
-       '6 issues. (Set options.summary for a summary.)']));
+       '4 issues. (Set options.summary for a summary.)']));
   },
 
   localContentNoEmptyFragments: function(test) {

@@ -3,7 +3,7 @@
   "description": "Grunt task that checks various aspects of a web page for correctness.",
   "version": "0.9.0",
   "homepage": "https://github.com/DavidAnson/grunt-check-pages",
-  "author": "David Anson (http://dlaa.me/)",
+  "author": "David Anson (https://dlaa.me/)",
   "repository": {
     "type": "git",
     "url": "https://github.com/DavidAnson/grunt-check-pages.git"
@@ -20,20 +20,20 @@
     "test-cover": "istanbul cover node_modules/nodeunit/bin/nodeunit"
   },
   "dependencies": {
-    "check-pages": "^0.9.0"
+    "check-pages": "^0.10.0"
   },
   "devDependencies": {
-    "grunt": "~0.4.5",
-    "grunt-contrib-nodeunit": "^0.4.1",
-    "grunt-contrib-watch": "^0.6.1",
-    "grunt-eslint": "^14.0.0",
-    "gruntmock": "^0.2.0",
-    "istanbul": "^0.3.14",
-    "nock": "2.16.0",
+    "grunt": "^1.0.1",
+    "grunt-contrib-nodeunit": "^1.0.0",
+    "grunt-contrib-watch": "^1.0.0",
+    "grunt-eslint": "^18.1.0",
+    "gruntmock": "^0.2.1",
+    "istanbul": "^0.4.3",
+    "nock": "^8.0.0",
     "nodeunit": "^0.9.1"
   },
   "peerDependencies": {
-    "grunt": ">=0.4.0"
+    "grunt": ">=0.4.4"
   },
   "keywords": [
     "gruntplugin",
