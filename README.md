@@ -24,7 +24,7 @@ Once the plugin has been installed, it may be enabled inside your Gruntfile with
 grunt.loadNpmTasks('grunt-check-pages');
 ```
 
-For similar functionality without a Grunt dependency, please see the [`check-pages` package](https://www.npmjs.com/package/check-pages).
+For similar functionality without a Grunt dependency, please see the [`check-pages` package](https://github.com/DavidAnson/check-pages).
 
 For direct use, the [`check-pages-cli` package](https://github.com/DavidAnson/check-pages-cli) wraps `check-pages` with a command-line interface.
 
