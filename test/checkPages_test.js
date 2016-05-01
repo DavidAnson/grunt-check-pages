@@ -1215,13 +1215,13 @@ exports.checkPages = {
   requestHeaders: function(test) {
     test.expect(4);
     nock('http://example.com')
-      .matchHeader('User-Agent', 'grunt-check-pages/0.9.0')
+      .matchHeader('User-Agent', 'grunt-check-pages/0.10.0')
       .matchHeader('Cache-Control', 'no-cache')
       .matchHeader('Pragma', 'no-cache')
       .get('/page')
       .reply(200, '<html><body><a href="link">link</a></body></html>');
     nock('http://example.com')
-      .matchHeader('User-Agent', 'grunt-check-pages/0.9.0')
+      .matchHeader('User-Agent', 'grunt-check-pages/0.10.0')
       .matchHeader('Cache-Control', 'no-cache')
       .matchHeader('Pragma', 'no-cache')
       .head('/link')
